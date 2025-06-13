@@ -49,7 +49,7 @@ function ChallengeCompletePage({ badgeId, progress, onNextChallenge, onMyBadges 
             Next Challenge
           </button>
           <button 
-            className="my-badges-button"
+            className="my-badges-button text-2xl font-bold"
             onClick={onMyBadges}
           >
             My Badges
