@@ -54,6 +54,8 @@ function SettingsSection({ onClose, onShowGrownUpModal }: SettingsSectionProps) 
   };
 
   const handleResetSpecificBadge = () => {
+    console.log('Reset specific badge button clicked');
+    
     const badgeId = prompt(
       'Enter the badge ID to reset (e.g., "brave_voice", "deep_thinker", "stay_positive"):\n\n' +
       'Common badge IDs:\n' +
@@ -77,14 +79,21 @@ function SettingsSection({ onClose, onShowGrownUpModal }: SettingsSectionProps) 
       '• super_star'
     );
 
+    console.log('User entered badge ID:', badgeId);
+
     if (badgeId && badgeId.trim()) {
+      console.log('Calling resetSpecificBadge with:', badgeId.trim());
       const success = resetSpecificBadge(badgeId.trim());
+      console.log('Reset result:', success);
+      
       if (success) {
         alert(`Badge "${badgeId}" has been reset successfully! The page will reload to reflect changes.`);
         window.location.reload();
       } else {
-        alert(`Failed to reset badge "${badgeId}". Please check the badge ID and try again.`);
+        alert(`Failed to reset badge "${badgeId}". Please check the badge ID and try again. Check the console for more details.`);
       }
+    } else {
+      console.log('No badge ID entered or empty string');
     }
   };
 
