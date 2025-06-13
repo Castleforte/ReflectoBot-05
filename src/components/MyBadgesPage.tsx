@@ -1,31 +1,13 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { allBadges } from '../badgeData';
 import { ReflectoBotProgress } from '../types';
 
 interface MyBadgesPageProps {
   progress: ReflectoBotProgress;
   onNextChallenge: () => void;
-  newlyEarnedBadgeId?: string | null;
 }
 
-function MyBadgesPage({ progress, onNextChallenge, newlyEarnedBadgeId }: MyBadgesPageProps) {
-  const badgeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
-  // Scroll to newly earned badge and highlight it
-  useEffect(() => {
-    if (newlyEarnedBadgeId && badgeRefs.current[newlyEarnedBadgeId]) {
-      const badgeElement = badgeRefs.current[newlyEarnedBadgeId];
-      if (badgeElement) {
-        setTimeout(() => {
-          badgeElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-          });
-        }, 300);
-      }
-    }
-  }, [newlyEarnedBadgeId]);
-
+function MyBadgesPage({ progress, onNextChallenge }: MyBadgesPageProps) {
   return (
     <div className="my-badges-content">
       <div className="my-badges-header">
@@ -45,13 +27,10 @@ function MyBadgesPage({ progress, onNextChallenge, newlyEarnedBadgeId }: MyBadge
       <div className="badges-grid">
         {allBadges.map((badge) => {
           const isEarned = progress.badges[badge.id];
-          const isNewlyEarned = badge.id === newlyEarnedBadgeId;
-          
           return (
             <div 
               key={badge.id}
-              ref={(el) => { badgeRefs.current[badge.id] = el; }}
-              className={`badge-item ${isEarned ? 'badge-earned' : 'badge-unearned'} ${isNewlyEarned ? 'badge-newly-earned' : ''}`}
+              className={`badge-item ${isEarned ? 'badge-earned' : 'badge-unearned'}`}
             >
               <img 
                 src={badge.icon}

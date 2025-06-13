@@ -10,14 +10,14 @@ interface ChallengesSectionProps {
   onClose: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   initialSubScreen?: 'next-challenge' | 'my-badges';
-  newlyEarnedBadge?: string | null;
 }
 
 type ChallengeScreen = 'next-challenge' | 'challenge-complete' | 'my-badges';
 
-function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-challenge', newlyEarnedBadge }: ChallengesSectionProps) {
+function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-challenge' }: ChallengesSectionProps) {
   const [currentScreen, setCurrentScreen] = useState<ChallengeScreen>(initialSubScreen);
   const [progress, setProgress] = useState<ReflectoBotProgress>(loadProgress());
+  const [newlyEarnedBadge, setNewlyEarnedBadge] = useState<string | null>(null);
 
   // Listen for changes in initialSubScreen prop and update internal state
   useEffect(() => {
@@ -77,9 +77,6 @@ function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-c
       case 'stay_positive':
         setRobotSpeech("Let's spread some positivity! Go to Chat and share some encouraging thoughts with me.");
         break;
-      case 'goal_getter':
-        setRobotSpeech("You're so close to earning the Goal Getter badge! Complete one more challenge to reach your goal!");
-        break;
       default:
         setRobotSpeech("Great choice! Go explore and complete your challenge. I believe in you!");
     }
@@ -87,6 +84,7 @@ function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-c
 
   const handleNextChallenge = () => {
     setCurrentScreen('next-challenge');
+    setNewlyEarnedBadge(null);
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
   };
 
@@ -154,11 +152,19 @@ function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-c
         />
       )}
       
+      {currentScreen === 'challenge-complete' && newlyEarnedBadge && (
+        <ChallengeCompletePage
+          badgeId={newlyEarnedBadge}
+          progress={progress}
+          onNextChallenge={handleNextChallenge}
+          onMyBadges={handleMyBadges}
+        />
+      )}
+      
       {currentScreen === 'my-badges' && (
         <MyBadgesPage
           progress={progress}
           onNextChallenge={handleBackToNextChallenge}
-          newlyEarnedBadgeId={newlyEarnedBadge}
         />
       )}
     </div>
