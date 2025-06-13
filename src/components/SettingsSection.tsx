@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { resetSpecificBadge, exportProgress, importProgress } from '../utils/progressManager';
+import { resetSpecificBadge, exportProgress, importProgress, skipToChallenge } from '../utils/progressManager';
 
 interface SettingsSectionProps {
   onClose: () => void;
@@ -97,6 +97,47 @@ function SettingsSection({ onClose, onShowGrownUpModal }: SettingsSectionProps) 
     }
   };
 
+  const handleSkipToChallenge = () => {
+    console.log('Skip to challenge button clicked');
+    
+    const badgeId = prompt(
+      'Enter the badge ID to skip to (e.g., "brave_voice", "deep_thinker", "stay_positive"):\n\n' +
+      'Available badge IDs:\n' +
+      '• calm_creator\n' +
+      '• mood_mapper\n' +
+      '• bounce_back\n' +
+      '• reflecto_rookie\n' +
+      '• focus_finder\n' +
+      '• goal_getter\n' +
+      '• great_job\n' +
+      '• brave_voice\n' +
+      '• what_if_explorer\n' +
+      '• truth_spotter\n' +
+      '• kind_heart\n' +
+      '• boost_buddy\n' +
+      '• stay_positive\n' +
+      '• good_listener\n' +
+      '• creative_spark\n' +
+      '• deep_thinker\n' +
+      '• resilient\n' +
+      '• super_star'
+    );
+
+    console.log('User entered badge ID for skip:', badgeId);
+
+    if (badgeId && badgeId.trim()) {
+      console.log('Calling skipToChallenge with:', badgeId.trim());
+      try {
+        skipToChallenge(badgeId.trim());
+      } catch (error) {
+        console.error('Error skipping to challenge:', error);
+        alert(`Failed to skip to challenge "${badgeId}". Please check the badge ID and try again.`);
+      }
+    } else {
+      console.log('No badge ID entered or empty string');
+    }
+  };
+
   return (
     <div className="settings-section">
       <div className="settings-content">
@@ -165,6 +206,13 @@ function SettingsSection({ onClose, onShowGrownUpModal }: SettingsSectionProps) 
                 style={{ marginLeft: '10px' }}
               >
                 Reset Specific Badge
+              </button>
+              <button
+                className="settings-button settings-button-lg"
+                onClick={handleSkipToChallenge}
+                style={{ marginLeft: '10px' }}
+              >
+                Skip to Challenge
               </button>
             </div>
           </div>
