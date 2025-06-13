@@ -82,16 +82,16 @@ const handleBadgeEarned = (badgeId: string) => {
         updatedProgress.pdfExportCount = Math.max(updatedProgress.pdfExportCount, 1);
         break;
       case 'brave_voice':
-        updatedProgress.badges.brave_voice = true;
+        // Don't set badge directly - let checkAndUpdateBadges handle it
         break;
       case 'what_if_explorer':
         updatedProgress.whatIfPromptViews = Math.max(updatedProgress.whatIfPromptViews, 3);
         break;
       case 'truth_spotter':
-        updatedProgress.badges.truth_spotter = true;
+        // Don't set badge directly - let checkAndUpdateBadges handle it
         break;
       case 'kind_heart':
-        updatedProgress.badges.kind_heart = true;
+        // Don't set badge directly - let checkAndUpdateBadges handle it
         break;
       case 'good_listener':
         updatedProgress.historyViews = Math.max(updatedProgress.historyViews, 3);
@@ -100,11 +100,11 @@ const handleBadgeEarned = (badgeId: string) => {
         updatedProgress.colorsUsedInDrawing = Math.max(updatedProgress.colorsUsedInDrawing, 5);
         break;
       case 'deep_thinker':
-        // Track long messages for Reflecto Rookie
+        // Track long messages for Deep Thinker
+        updatedProgress.hasLongMessageSent = true;
         if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 3) { // reflecto_rookie is at index 3
           setReflectoRookieHasLongMessage(true);
         }
-        updatedProgress.badges.deep_thinker = true;
         break;
       case 'boost_buddy':
         updatedProgress.readItToMeUsed = Math.max(updatedProgress.readItToMeUsed, 1);
@@ -133,7 +133,7 @@ const handleBadgeEarned = (badgeId: string) => {
         console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
         setCurrentScreen('challenge-complete');
         setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
-        setProgress(updatedProgress); // Use the already updated state
+        setProgress(loadProgress()); // Refresh progress state
         
         // Reset tracking states for immediately awarded badges
         setReflectoRookieMessageCount(0);

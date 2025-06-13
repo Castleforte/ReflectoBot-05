@@ -24,7 +24,8 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     lastVisitDate: today,
     challengeActive: false,
     currentChallengeIndex: 0,
-    stayPositiveMessageCount: 0
+    stayPositiveMessageCount: 0,
+    hasLongMessageSent: false
   };
 };
 
@@ -41,7 +42,8 @@ export const loadProgress = (): ReflectoBotProgress => {
         // Ensure new fields are properly initialized
         challengeActive: parsed.challengeActive ?? false,
         currentChallengeIndex: parsed.currentChallengeIndex ?? 0,
-        stayPositiveMessageCount: parsed.stayPositiveMessageCount ?? 0
+        stayPositiveMessageCount: parsed.stayPositiveMessageCount ?? 0,
+        hasLongMessageSent: parsed.hasLongMessageSent ?? false
       };
     }
   } catch (error) {
@@ -64,6 +66,21 @@ export const updateProgress = (updates: Partial<ReflectoBotProgress>): ReflectoB
   saveProgress(updated);
   return updated;
 };
+
+export function checkCustomBadgeConditions(badgeId: string, progress: ReflectoBotProgress): boolean {
+  switch (badgeId) {
+    case 'reflecto_rookie':
+      return (progress.chatMessageCount >= 2 && progress.hasLongMessageSent);
+    case 'focus_finder':
+      return (progress.focusedChallengeCompleted);
+    case 'stay_positive':
+      return (progress.stayPositiveMessageCount >= 3);
+    case 'deep_thinker':
+      return (progress.hasLongMessageSent);
+    default:
+      return false;
+  }
+}
 
 // New badge checking system with gatekeeping rules
 export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: ReflectoBotProgress): string | null => {
@@ -94,14 +111,13 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
       conditionMet = progress.undoCount >= 3;
       break;
     case 'reflecto_rookie':
-      // Special handling for Reflecto Rookie - checked in App.tsx
-      conditionMet = progress.chatMessageCount >= 2;
+      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
       break;
     case 'focus_finder':
-      conditionMet = progress.focusedChallengeCompleted;
+      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
       break;
     case 'stay_positive':
-      conditionMet = progress.stayPositiveMessageCount >= 3;
+      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
       break;
     case 'great_job':
       conditionMet = progress.pdfExportCount >= 1;
@@ -134,8 +150,7 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
       conditionMet = progress.colorsUsedInDrawing >= 5;
       break;
     case 'deep_thinker':
-      // Condition already verified by calling component
-      conditionMet = true;
+      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
       break;
     case 'boost_buddy':
       // Condition already verified by calling component
@@ -310,6 +325,7 @@ export const resetSpecificBadge = (badgeId: string): boolean => {
         break;
       case 'reflecto_rookie':
         updatedProgress.chatMessageCount = 0;
+        updatedProgress.hasLongMessageSent = false;
         break;
       case 'focus_finder':
         updatedProgress.focusedChallengeCompleted = false;
@@ -328,6 +344,9 @@ export const resetSpecificBadge = (badgeId: string): boolean => {
         break;
       case 'creative_spark':
         updatedProgress.colorsUsedInDrawing = 0;
+        break;
+      case 'deep_thinker':
+        updatedProgress.hasLongMessageSent = false;
         break;
       case 'boost_buddy':
         updatedProgress.readItToMeUsed = 0;
@@ -350,20 +369,3 @@ export const resetSpecificBadge = (badgeId: string): boolean => {
     return false;
   }
 };
-
-// --- Begin Enhanced Badge Logic Insert ---
-
-export function checkCustomBadgeConditions(badgeId: string, progress: ReflectoBotProgress): boolean {
-  switch (badgeId) {
-    case 'reflecto_rookie':
-      return (progress.chatMessageCount >= 2 && progress.longMessagesSent >= 1);
-    case 'focus_finder':
-      return (progress.focusSessionCompleted === true);
-    case 'stay_positive':
-      return (progress.stayPositiveMessageCount >= 3);
-    default:
-      return false;
-  }
-}
-
-// --- End Enhanced Badge Logic Insert ---

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { chatPrompts, promptStarters } from '../prompts';
 import { ConversationTurn } from '../types';
-import { loadProgress } from '../utils/progressManager';
+import { loadProgress, updateProgress } from '../utils/progressManager';
 
 interface ChatSectionProps {
   onClose: () => void;
@@ -134,6 +134,9 @@ function ChatSection({
     
     // Check for specific badge conditions
     if (trimmedMessage.split(/\s+/).length >= 15) {
+      // Update progress to mark that a long message has been sent
+      const currentProgress = loadProgress();
+      updateProgress({ hasLongMessageSent: true });
       onBadgeEarned('deep_thinker'); // 15+ words badge
     }
     
