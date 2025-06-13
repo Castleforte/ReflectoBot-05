@@ -70,7 +70,7 @@ const handleBadgeEarned = (badgeId: string) => {
         // Don't set badge directly - let checkAndUpdateBadges handle it
         break;
       case 'what_if_explorer':
-        updatedProgress.whatIfPromptViews = updatedProgress.whatIfPromptViews + 1;
+        // Progress is already updated in WhatIfSection.tsx
         break;
       case 'truth_spotter':
         // Don't set badge directly - let checkAndUpdateBadges handle it
@@ -169,7 +169,7 @@ const handleBadgeEarned = (badgeId: string) => {
     const currentProgress = loadProgress();
     if (currentProgress.challengeActive && 
         currentProgress.currentChallengeIndex === 8 && // what_if_explorer is at index 8
-        currentProgress.whatIfPromptViews >= 3) {
+        currentProgress.whatIfPromptsAnswered >= 3) {
       handleBadgeEarned('what_if_explorer');
     }
   };

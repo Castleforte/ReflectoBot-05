@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { whatIfPrompts } from '../whatIfPrompts';
-import { updateProgress } from '../utils/progressManager';
+import { updateProgress, loadProgress } from '../utils/progressManager';
 
 interface WhatIfSectionProps {
   onClose: () => void;
@@ -32,8 +32,11 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningfulAct
     // Track meaningful action for Focus Finder
     onMeaningfulAction();
 
-    // Track badge progress for viewing What If prompts (for viewing count)
-    onBadgeEarned('what_if_explorer');
+    // Track viewing prompts (separate from answering)
+    const currentProgress = loadProgress();
+    updateProgress({ 
+      whatIfPromptViews: currentProgress.whatIfPromptViews + 1 
+    });
   };
 
   const handleReadItToMe = () => {
@@ -64,8 +67,9 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningfulAct
     if (!trimmedText) return;
 
     // Update progress to track answered prompts
+    const currentProgress = loadProgress();
     updateProgress({ 
-      whatIfPromptsAnswered: (prev) => prev.whatIfPromptsAnswered + 1 
+      whatIfPromptsAnswered: currentProgress.whatIfPromptsAnswered + 1 
     });
 
     // TODO: Save the response or handle it as needed
