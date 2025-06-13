@@ -11,6 +11,7 @@ createRoot(document.getElementById('root')!).render(
 );
 
 // Expose for testing purposes
+console.log('Value of skipToChallenge before assignment:', skipToChallenge);
 (window as any).skipToChallenge = skipToChallenge;
 console.log('skipToChallenge function exposed globally.');
 
