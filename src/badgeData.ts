@@ -42,11 +42,11 @@ export const allBadges: Badge[] = [
     earned: false
   },
   {
-    id: 'stay_positive',
-    name: 'Stay Positive',
-    description: 'Select a happy emoji',
-    icon: '/badges/StayPositive.png',
-    colorIcon: '/badges/StayPositive.png',
+    id: 'goal_getter',
+    name: 'Goal Getter',
+    description: 'Complete 5 total challenges',
+    icon: '/badges/GoalGetter.png',
+    colorIcon: '/badges/GoalGetter.png',
     earned: false
   },
   {
@@ -98,11 +98,11 @@ export const allBadges: Badge[] = [
     earned: false
   },
   {
-    id: 'goal_getter',
-    name: 'Goal Getter',
-    description: 'Complete 5 total challenges',
-    icon: '/badges/GoalGetter.png',
-    colorIcon: '/badges/GoalGetter.png',
+    id: 'stay_positive',
+    name: 'Stay Positive',
+    description: 'Select a happy emoji',
+    icon: '/badges/StayPositive.png',
+    colorIcon: '/badges/StayPositive.png',
     earned: false
   },
   {
@@ -179,10 +179,10 @@ export const challengeDetails: Challenge[] = [
     badgeId: 'focus_finder'
   },
   {
-    id: 'stay_positive_challenge',
-    title: 'Stay Positive Challenge',
-    description: 'Find something that makes you happy today and select the happy emoji.\nPositivity is a superpower!',
-    badgeId: 'stay_positive'
+    id: 'goal_getter_challenge',
+    title: 'Goal Getter Challenge',
+    description: 'Show your determination by completing 5 total challenges.\nYou\'re unstoppable when you set your mind to it!',
+    badgeId: 'goal_getter'
   },
   {
     id: 'great_job_challenge',
@@ -221,10 +221,10 @@ export const challengeDetails: Challenge[] = [
     badgeId: 'boost_buddy'
   },
   {
-    id: 'goal_getter_challenge',
-    title: 'Goal Getter Challenge',
-    description: 'Show your determination by completing 5 total challenges.\nYou\'re unstoppable when you set your mind to it!',
-    badgeId: 'goal_getter'
+    id: 'stay_positive_challenge',
+    title: 'Stay Positive Challenge',
+    description: 'Find something that makes you happy today and select the happy emoji.\nPositivity is a superpower!',
+    badgeId: 'stay_positive'
   },
   {
     id: 'good_listener_challenge',
@@ -265,14 +265,14 @@ export const badgeQueue = [
   'bounce_back',
   'reflecto_rookie',
   'focus_finder',
-  'stay_positive',
+  'goal_getter',
   'great_job',
   'brave_voice',
   'what_if_explorer',
   'truth_spotter',
   'kind_heart',
   'boost_buddy',
-  'goal_getter',
+  'stay_positive',
   'good_listener',
   'creative_spark',
   'deep_thinker',
