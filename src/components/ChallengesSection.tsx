@@ -36,12 +36,26 @@ function ChallengesSection({
 
   // Get the current challenge based on progress
   const getCurrentChallenge = () => {
-    // Get the badge ID from the queue based on current index
-    const currentBadgeId = badgeQueue[progress.currentChallengeIndex];
-    if (!currentBadgeId) return null; // All challenges completed
+    // Start from current challenge index and find the next actionable challenge
+    for (let i = progress.currentChallengeIndex; i < badgeQueue.length; i++) {
+      const badgeId = badgeQueue[i];
+      
+      // Skip cumulative badges (goal_getter and super_star) as they're not actionable challenges
+      if (badgeId === 'goal_getter' || badgeId === 'super_star') {
+        continue;
+      }
+      
+      // Check if this badge has already been earned
+      if (!progress.badges[badgeId]) {
+        // Find the challenge details for this badge
+        const challenge = challengeDetails.find(challenge => challenge.badgeId === badgeId);
+        if (challenge) {
+          return challenge;
+        }
+      }
+    }
     
-    // Find the challenge details for this badge
-    return challengeDetails.find(challenge => challenge.badgeId === currentBadgeId);
+    return null; // All actionable challenges completed
   };
 
   const currentChallenge = getCurrentChallenge();
