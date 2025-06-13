@@ -47,16 +47,15 @@ function App() {
   // Function to check and award cumulative badges (Goal Getter and Super Star)
   const checkCumulativeBadges = () => {
     const currentProgress = loadProgress();
-    const nextBadgeId = badgeQueue[currentProgress.currentChallengeIndex];
     
     // Check for Goal Getter badge (complete 5 challenges)
-    if (nextBadgeId === 'goal_getter' && currentProgress.challengesCompleted >= 5) {
+    if (currentProgress.challengesCompleted >= 5 && !currentProgress.badges['goal_getter']) {
       handleBadgeEarned('goal_getter');
       return; // Exit early to avoid checking Super Star in the same cycle
     }
     
     // Check for Super Star badge (earn all 17 other badges)
-    if (nextBadgeId === 'super_star' && currentProgress.badgeCount >= 17) {
+    if (currentProgress.badgeCount >= 17 && !currentProgress.badges['super_star']) {
       handleBadgeEarned('super_star');
     }
   };
@@ -86,8 +85,7 @@ function App() {
     const updatedProgress = {
       ...currentProgress,
       challengeActive: false,
-      currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1),
-      challengesCompleted: currentProgress.challengesCompleted + 1
+      currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1)
     };
     updateProgress(updatedProgress);
     setProgress(updatedProgress); // Update local state
