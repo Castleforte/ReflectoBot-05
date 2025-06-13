@@ -90,11 +90,11 @@ export const allBadges: Badge[] = [
     earned: false
   },
   {
-    id: 'super_star',
-    name: 'Super Star',
-    description: 'Earn all 18 badges',
-    icon: '/badges/SuperStar.png',
-    colorIcon: '/badges/SuperStar.png',
+    id: 'boost_buddy',
+    name: 'Boost Buddy',
+    description: 'Use "Read it to me" button',
+    icon: '/badges/BoostBuddy.png',
+    colorIcon: '/badges/BoostBuddy.png',
     earned: false
   },
   {
@@ -130,19 +130,19 @@ export const allBadges: Badge[] = [
     earned: false
   },
   {
-    id: 'boost_buddy',
-    name: 'Boost Buddy',
-    description: 'Use "Read it to me" button',
-    icon: '/badges/BoostBuddy.png',
-    colorIcon: '/badges/BoostBuddy.png',
-    earned: false
-  },
-  {
     id: 'resilient',
     name: 'Resilient',
     description: 'Return 3 separate days',
     icon: '/badges/Resilient.png',
     colorIcon: '/badges/Resilient.png',
+    earned: false
+  },
+  {
+    id: 'super_star',
+    name: 'Super Star',
+    description: 'Earn all 18 badges',
+    icon: '/badges/SuperStar.png',
+    colorIcon: '/badges/SuperStar.png',
     earned: false
   }
 ];
