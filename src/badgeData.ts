@@ -215,6 +215,12 @@ export const challengeDetails: Challenge[] = [
     badgeId: 'kind_heart'
   },
   {
+    id: 'boost_buddy_challenge',
+    title: 'Boost Buddy Challenge',
+    description: 'Use the "Read it to me" feature in the What If section.\nSometimes hearing things out loud helps us think differently!',
+    badgeId: 'boost_buddy'
+  },
+  {
     id: 'goal_getter_challenge',
     title: 'Goal Getter Challenge',
     description: 'Show your determination by completing 5 total challenges.\nYou\'re unstoppable when you set your mind to it!',
@@ -239,26 +245,20 @@ export const challengeDetails: Challenge[] = [
     badgeId: 'deep_thinker'
   },
   {
-    id: 'boost_buddy_challenge',
-    title: 'Boost Buddy Challenge',
-    description: 'Use the "Read it to me" feature in the What If section.\nSometimes hearing things out loud helps us think differently!',
-    badgeId: 'boost_buddy'
+    id: 'resilient_challenge',
+    title: 'Resilient Challenge',
+    description: 'Show your commitment by returning to ReflectoBot on different days.\nConsistency is the key to growth!',
+    badgeId: 'resilient'
   },
   {
     id: 'super_star_challenge',
     title: 'Super Star Challenge',
     description: 'Achieve greatness by earning all other badges.\nYou\'re truly a ReflectoBot superstar!',
     badgeId: 'super_star'
-  },
-  {
-    id: 'resilient_challenge',
-    title: 'Resilient Challenge',
-    description: 'Show your commitment by returning to ReflectoBot on different days.\nConsistency is the key to growth!',
-    badgeId: 'resilient'
   }
 ];
 
-// Badge queue in the specified fixed order
+// Badge queue in the specified fixed order - now matches the display order
 export const badgeQueue = [
   'calm_creator',
   'mood_mapper',
@@ -271,11 +271,11 @@ export const badgeQueue = [
   'what_if_explorer',
   'truth_spotter',
   'kind_heart',
-  'super_star',
+  'boost_buddy',
   'goal_getter',
   'good_listener',
   'creative_spark',
   'deep_thinker',
-  'boost_buddy',
-  'resilient'
+  'resilient',
+  'super_star'
 ];
