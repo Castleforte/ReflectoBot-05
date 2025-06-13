@@ -85,7 +85,7 @@ const handleBadgeEarned = (badgeId: string) => {
         // Don't set badge directly - let checkAndUpdateBadges handle it
         break;
       case 'what_if_explorer':
-        updatedProgress.whatIfPromptViews = Math.max(updatedProgress.whatIfPromptViews, 3);
+        updatedProgress.whatIfPromptViews = updatedProgress.whatIfPromptViews + 1;
         break;
       case 'truth_spotter':
         // Don't set badge directly - let checkAndUpdateBadges handle it
