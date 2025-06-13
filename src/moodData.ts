@@ -50,8 +50,8 @@ export const moodData = [
   { 
     name: 'love', 
     emoji: '😍',
-    blueImage: '/Mood-Emojis_0000s_0007_happy-blue.png',
-    colorImage: '/Mood-Emojis_0001s_0007_happy-color.png'
+    blueImage: '/Mood-Emojis_0000s_0008_love-blue.png',
+    colorImage: '/Mood-Emojis_0000s_0008_love-color.png'
   }
 ];
 
