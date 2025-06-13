@@ -137,8 +137,8 @@ const handleBadgeEarned = (badgeId: string) => {
     const awardedBadgeId = checkAndUpdateBadges(badgeId, updatedProgress);
     
     if (awardedBadgeId) {
-      // Focus Finder, Stay Positive, What If Explorer, Goal Getter, and Super Star should be pending badges
-      if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive' || awardedBadgeId === 'what_if_explorer' || awardedBadgeId === 'goal_getter' || awardedBadgeId === 'super_star') {
+      // Only Focus Finder, Stay Positive, and What If Explorer should be pending badges
+      if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive' || awardedBadgeId === 'what_if_explorer') {
         setPendingAwardedBadge(awardedBadgeId);
         // Do NOT change screen or robot speech here. The display will be delayed.
         
@@ -536,7 +536,6 @@ const handleBadgeEarned = (badgeId: string) => {
             onClose={() => handleSectionClose('challenges')}
             setRobotSpeech={setRobotSpeech}
             initialSubScreen={challengesSubScreen}
-            newlyEarnedBadgeId={newlyEarnedBadge}
           />
         ) : currentScreen === 'challenge-complete' && newlyEarnedBadge ? (
           <ChallengeCompletePage
@@ -544,7 +543,6 @@ const handleBadgeEarned = (badgeId: string) => {
             progress={progress}
             onNextChallenge={handleNextChallengeFromApp}
             onMyBadges={handleMyBadgesFromApp}
-            newlyEarnedBadgeId={newlyEarnedBadge}
           />
         ) : (
           <div className="info-section">
