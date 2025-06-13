@@ -605,3 +605,4 @@ const handleBadgeEarned = (badgeId: string) => {
 }
 
 export default App;
+// Trigger rebuild - minor comment
