@@ -73,16 +73,16 @@ export const updateProgress = (updates: Partial<ReflectoBotProgress>): ReflectoB
 
 // New badge checking system with gatekeeping rules
 export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: ReflectoBotProgress): string | null => {
-  // Only award badges if challenge is active
-  if (!progress.challengeActive) {
+  // Only award badges if challenge is active (except for cumulative badges)
+  if (!progress.challengeActive && triggeredBadgeId !== 'goal_getter' && triggeredBadgeId !== 'super_star') {
     return null;
   }
 
   // Get the expected badge based on current challenge index
   const expectedBadgeId = badgeQueue[progress.currentChallengeIndex];
   
-  // Only award if the triggered badge matches the expected badge
-  if (triggeredBadgeId !== expectedBadgeId) {
+  // Only award if the triggered badge matches the expected badge (except for cumulative badges)
+  if (triggeredBadgeId !== expectedBadgeId && triggeredBadgeId !== 'goal_getter' && triggeredBadgeId !== 'super_star') {
     return null;
   }
 
@@ -105,8 +105,8 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     case 'focus_finder':
       conditionMet = progress.focusedChallengeCompleted;
       break;
-    case 'stay_positive':
-      conditionMet = progress.stayPositiveMessageCount >= 3;
+    case 'goal_getter':
+      conditionMet = progress.challengesCompleted >= 5;
       break;
     case 'great_job':
       conditionMet = progress.pdfExportCount >= 1;
@@ -128,11 +128,8 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     case 'boost_buddy':
       conditionMet = progress.readItToMeUsed >= 1;
       break;
-    case 'super_star':
-      conditionMet = progress.badgeCount >= 17;
-      break;
-    case 'goal_getter':
-      conditionMet = progress.challengesCompleted >= 5;
+    case 'stay_positive':
+      conditionMet = progress.stayPositiveMessageCount >= 3;
       break;
     case 'good_listener':
       conditionMet = progress.historyViews >= 3;
@@ -146,6 +143,9 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     case 'resilient':
       conditionMet = progress.returnDays.length >= 3;
       break;
+    case 'super_star':
+      conditionMet = progress.badgeCount >= 17;
+      break;
     default:
       return null;
   }
@@ -156,9 +156,9 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     const updatedBadges = { ...progress.badges, [triggeredBadgeId]: true };
     const newBadgeCount = progress.badgeCount + 1;
     
-    // For focus_finder, stay_positive, and what_if_explorer badges, don't update challenge state here
+    // For focus_finder, stay_positive, what_if_explorer, goal_getter, and super_star badges, don't update challenge state here
     // This will be handled in App.tsx when the completion screen is displayed
-    if (triggeredBadgeId === 'focus_finder' || triggeredBadgeId === 'stay_positive' || triggeredBadgeId === 'what_if_explorer') {
+    if (triggeredBadgeId === 'focus_finder' || triggeredBadgeId === 'stay_positive' || triggeredBadgeId === 'what_if_explorer' || triggeredBadgeId === 'goal_getter' || triggeredBadgeId === 'super_star') {
       const updatedProgress = {
         ...progress,
         badges: updatedBadges,

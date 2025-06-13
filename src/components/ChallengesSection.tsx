@@ -10,11 +10,21 @@ interface ChallengesSectionProps {
   onClose: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   initialSubScreen?: 'next-challenge' | 'my-badges';
+  showGoalGetterCard: boolean;
+  setShowGoalGetterCard: React.Dispatch<React.SetStateAction<boolean>>;
+  onCollectGoalGetterBadge: () => void;
 }
 
 type ChallengeScreen = 'next-challenge' | 'challenge-complete' | 'my-badges';
 
-function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-challenge' }: ChallengesSectionProps) {
+function ChallengesSection({ 
+  onClose, 
+  setRobotSpeech, 
+  initialSubScreen = 'next-challenge',
+  showGoalGetterCard,
+  setShowGoalGetterCard,
+  onCollectGoalGetterBadge
+}: ChallengesSectionProps) {
   const [currentScreen, setCurrentScreen] = useState<ChallengeScreen>(initialSubScreen);
   const [progress, setProgress] = useState<ReflectoBotProgress>(loadProgress());
   const [newlyEarnedBadge, setNewlyEarnedBadge] = useState<string | null>(null);
@@ -149,6 +159,8 @@ function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-c
           onStartChallenge={handleStartChallenge}
           onMyBadges={handleMyBadges}
           progress={progress}
+          showGoalGetterCard={showGoalGetterCard}
+          onCollectGoalGetterBadge={onCollectGoalGetterBadge}
         />
       )}
       

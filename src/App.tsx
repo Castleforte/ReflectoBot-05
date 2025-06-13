@@ -25,6 +25,7 @@ function App() {
   const [progress, setProgress] = useState<ReflectoBotProgress>(loadProgress());
   const [newlyEarnedBadge, setNewlyEarnedBadge] = useState<string | null>(null);
   const [pendingAwardedBadge, setPendingAwardedBadge] = useState<string | null>(null);
+  const [showGoalGetterCard, setShowGoalGetterCard] = useState<boolean>(false);
   const [robotSpeech, setRobotSpeech] = useState<string>(
     "Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!"
   );
@@ -137,8 +138,18 @@ const handleBadgeEarned = (badgeId: string) => {
     const awardedBadgeId = checkAndUpdateBadges(badgeId, updatedProgress);
     
     if (awardedBadgeId) {
-      // Only Focus Finder, Stay Positive, and What If Explorer should be pending badges
-      if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive' || awardedBadgeId === 'what_if_explorer') {
+      // Special handling for Goal Getter badge
+      if (awardedBadgeId === 'goal_getter') {
+        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! Keep it up!");
+        setCurrentScreen('challenges');
+        setChallengesSubScreen('next-challenge');
+        setShowGoalGetterCard(true);
+        setProgress(loadProgress()); // Refresh progress state
+        return; // Exit early to show the special card
+      }
+      
+      // Only Focus Finder, Stay Positive, What If Explorer, and Super Star should be pending badges
+      if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive' || awardedBadgeId === 'what_if_explorer' || awardedBadgeId === 'super_star') {
         setPendingAwardedBadge(awardedBadgeId);
         // Do NOT change screen or robot speech here. The display will be delayed.
         
@@ -205,6 +216,28 @@ const handleBadgeEarned = (badgeId: string) => {
         currentProgress.whatIfPromptsAnswered >= 3) {
       handleBadgeEarned('what_if_explorer');
     }
+  };
+
+  const handleCollectGoalGetterBadge = () => {
+    // Update persistent progress for the Goal Getter badge
+    const currentProgress = loadProgress();
+    const updatedProgress = {
+      ...currentProgress,
+      challengeActive: false,
+      currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1),
+      challengesCompleted: currentProgress.challengesCompleted + 1
+    };
+    updateProgress(updatedProgress);
+    setProgress(updatedProgress); // Update local state
+    
+    // Reset Goal Getter card display
+    setShowGoalGetterCard(false);
+    
+    // Update robot speech
+    setRobotSpeech(`Wow! You've already earned ${updatedProgress.badgeCount} badges! Just ${18 - updatedProgress.badgeCount} more to unlock the full set. Keep going!`);
+    
+    // Navigate to My Badges page
+    handleMyBadgesFromApp();
   };
 
   const handleLogoClick = () => {
@@ -536,6 +569,9 @@ const handleBadgeEarned = (badgeId: string) => {
             onClose={() => handleSectionClose('challenges')}
             setRobotSpeech={setRobotSpeech}
             initialSubScreen={challengesSubScreen}
+            showGoalGetterCard={showGoalGetterCard}
+            setShowGoalGetterCard={setShowGoalGetterCard}
+            onCollectGoalGetterBadge={handleCollectGoalGetterBadge}
           />
         ) : currentScreen === 'challenge-complete' && newlyEarnedBadge ? (
           <ChallengeCompletePage
