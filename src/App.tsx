@@ -46,6 +46,23 @@ function App() {
     handleBadgeEarned('resilient');
   }, []);
 
+  // Function to check and award cumulative badges (Goal Getter and Super Star)
+  const checkCumulativeBadges = () => {
+    const currentProgress = loadProgress();
+    const nextBadgeId = badgeQueue[currentProgress.currentChallengeIndex];
+    
+    // Check for Goal Getter badge (complete 5 challenges)
+    if (nextBadgeId === 'goal_getter' && currentProgress.challengesCompleted >= 5) {
+      handleBadgeEarned('goal_getter');
+      return; // Exit early to avoid checking Super Star in the same cycle
+    }
+    
+    // Check for Super Star badge (earn all 17 other badges)
+    if (nextBadgeId === 'super_star' && currentProgress.badgeCount >= 17) {
+      handleBadgeEarned('super_star');
+    }
+  };
+
   // UPDATED BADGE LOGIC
 const handleBadgeEarned = (badgeId: string) => {
     const currentProgress = loadProgress();
@@ -94,7 +111,7 @@ const handleBadgeEarned = (badgeId: string) => {
         updatedProgress.focusedChallengeCompleted = true;
         break;
       case 'stay_positive':
-        if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 5) { // stay_positive is at index 5
+        if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 12) { // stay_positive is at index 12
           setStayPositiveMessageCount(prev => prev + 1);
           updatedProgress.stayPositiveMessageCount = updatedProgress.stayPositiveMessageCount + 1;
         }
@@ -104,6 +121,12 @@ const handleBadgeEarned = (badgeId: string) => {
         break;
       case 'resilient':
         // Progress is already updated by trackDailyVisit
+        break;
+      case 'goal_getter':
+        // This badge is awarded based on challengesCompleted count
+        break;
+      case 'super_star':
+        // This badge is awarded based on total badge count
         break;
     }
 
@@ -118,6 +141,11 @@ const handleBadgeEarned = (badgeId: string) => {
       if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive' || awardedBadgeId === 'what_if_explorer') {
         setPendingAwardedBadge(awardedBadgeId);
         // Do NOT change screen or robot speech here. The display will be delayed.
+        
+        // After awarding a pending badge, check for cumulative badges
+        setTimeout(() => {
+          checkCumulativeBadges();
+        }, 100);
       } else {
         // For all other badges, immediately show the complete page
         console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
@@ -130,6 +158,11 @@ const handleBadgeEarned = (badgeId: string) => {
         
         // Reset tracking states for immediately awarded badges
         setStayPositiveMessageCount(0);
+        
+        // After awarding any badge, check for cumulative badges
+        setTimeout(() => {
+          checkCumulativeBadges();
+        }, 100);
       }
     }
   };
@@ -159,7 +192,7 @@ const handleBadgeEarned = (badgeId: string) => {
   const checkStayPositiveConditions = () => {
     const currentProgress = loadProgress();
     if (currentProgress.challengeActive && 
-        currentProgress.currentChallengeIndex === 5 && // stay_positive is at index 5
+        currentProgress.currentChallengeIndex === 12 && // stay_positive is at index 12
         stayPositiveMessageCount >= 3) {
       handleBadgeEarned('stay_positive');
     }
@@ -196,6 +229,11 @@ const handleBadgeEarned = (badgeId: string) => {
       // Reset pending badge and tracking states
       setPendingAwardedBadge(null);
       setStayPositiveMessageCount(0);
+      
+      // After handling pending badge, check for cumulative badges
+      setTimeout(() => {
+        checkCumulativeBadges();
+      }, 100);
       
       return; // Stop further navigation in this handler to show the completion page
     }
@@ -240,6 +278,11 @@ const handleBadgeEarned = (badgeId: string) => {
       // Reset pending badge and tracking states
       setPendingAwardedBadge(null);
       setStayPositiveMessageCount(0);
+      
+      // After handling pending badge, check for cumulative badges
+      setTimeout(() => {
+        checkCumulativeBadges();
+      }, 100);
       
       return; // Stop further navigation in this handler to show the completion page
     }
@@ -322,6 +365,11 @@ const handleBadgeEarned = (badgeId: string) => {
       // Reset pending badge and tracking states
       setPendingAwardedBadge(null);
       setStayPositiveMessageCount(0);
+      
+      // After handling pending badge, check for cumulative badges
+      setTimeout(() => {
+        checkCumulativeBadges();
+      }, 100);
       
       return; // Stop further navigation in this handler to show the completion page
     }
