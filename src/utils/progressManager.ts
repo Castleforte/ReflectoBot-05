@@ -102,7 +102,7 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
       conditionMet = progress.undoCount >= 3;
       break;
     case 'reflecto_rookie':
-      conditionMet = progress.chatMessageCount >= 2 && progress.hasLongMessageSent;
+      conditionMet = progress.chatMessageCount >= 1;
       break;
     case 'focus_finder':
       conditionMet = progress.focusedChallengeCompleted;

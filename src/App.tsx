@@ -79,7 +79,7 @@ const handleBadgeEarned = (badgeId: string) => {
         updatedProgress.undoCount = Math.max(updatedProgress.undoCount, 3);
         break;
       case 'reflecto_rookie':
-        updatedProgress.chatMessageCount = updatedProgress.chatMessageCount + 1;
+        // Don't increment here - it's already handled in ChatSection
         break;
       case 'brave_voice':
         // Don't set badge directly - let checkAndUpdateBadges handle it
@@ -140,6 +140,14 @@ const handleBadgeEarned = (badgeId: string) => {
         setShowGoalGetterCard(true);
         setProgress(loadProgress()); // Refresh progress state
         return; // Exit early to show the special card
+      }
+      
+      // Special handling for Reflecto Rookie - make it pending to avoid interrupting chat
+      if (awardedBadgeId === 'reflecto_rookie') {
+        setPendingAwardedBadge(awardedBadgeId);
+        setRobotSpeech("Great job sending your first message! I'll show you your badge when you're done chatting.");
+        setProgress(loadProgress()); // Refresh progress state
+        return; // Exit early - badge will be shown when user navigates away
       }
       
       // Only Super Star should be a pending badge now
