@@ -84,7 +84,7 @@ export const allBadges: Badge[] = [
   {
     id: 'kind_heart',
     name: 'Kind Heart',
-    description: 'Choose a love emoji',
+    description: 'Write 25+ words about love or what you love most',
     icon: '/badges/KindHeart.png',
     colorIcon: '/badges/KindHeart.png',
     earned: false
@@ -211,7 +211,7 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'kind_heart_challenge',
     title: 'Kind Heart Challenge',
-    description: 'Express love and kindness by selecting a love emoji.\nSpread the love wherever you go!',
+    description: 'Express love and kindness by writing at least 25 words about love or what you love most in life.\nSpread the love wherever you go!',
     badgeId: 'kind_heart'
   },
   {

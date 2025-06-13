@@ -26,7 +26,8 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     challengeActive: false,
     currentChallengeIndex: 0,
     stayPositiveMessageCount: 0,
-    hasLongMessageSent: false
+    hasLongMessageSent: false,
+    kindHeartWordCount: 0
   };
 };
 
@@ -45,7 +46,8 @@ export const loadProgress = (): ReflectoBotProgress => {
         currentChallengeIndex: parsed.currentChallengeIndex ?? 0,
         stayPositiveMessageCount: parsed.stayPositiveMessageCount ?? 0,
         hasLongMessageSent: parsed.hasLongMessageSent ?? false,
-        whatIfPromptsAnswered: parsed.whatIfPromptsAnswered ?? 0
+        whatIfPromptsAnswered: parsed.whatIfPromptsAnswered ?? 0,
+        kindHeartWordCount: parsed.kindHeartWordCount ?? 0
       };
     }
   } catch (error) {
@@ -121,8 +123,7 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
       conditionMet = true;
       break;
     case 'kind_heart':
-      // Condition already verified by calling component
-      conditionMet = true;
+      conditionMet = progress.kindHeartWordCount >= 25;
       break;
     case 'boost_buddy':
       conditionMet = progress.readItToMeUsed >= 1;

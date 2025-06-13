@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { moodData, moodResponses, sentenceStarters } from '../moodData';
 import { MoodEntry } from '../types';
+import { updateProgress, loadProgress } from '../utils/progressManager';
 
 interface DailyCheckInSectionProps {
   onClose: () => void;
@@ -86,7 +87,25 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
       }
       
       if (selectedMood === 'love') {
-        onBadgeEarned('kind_heart'); // Love emoji badge
+        // For Kind Heart badge, check if the message contains love-related content and is 25+ words
+        const trimmedText = checkInText.trim();
+        const wordCount = trimmedText.split(/\s+/).filter(word => word.length > 0).length;
+        
+        // Check if the message contains love-related keywords
+        const loveKeywords = ['love', 'adore', 'cherish', 'treasure', 'appreciate', 'care', 'heart', 'affection', 'dear', 'precious'];
+        const containsLoveContent = loveKeywords.some(keyword => 
+          trimmedText.toLowerCase().includes(keyword.toLowerCase())
+        );
+        
+        if (containsLoveContent && wordCount >= 25) {
+          // Update progress with the word count
+          const currentProgress = loadProgress();
+          updateProgress({ 
+            kindHeartWordCount: Math.max(currentProgress.kindHeartWordCount, wordCount)
+          });
+          
+          onBadgeEarned('kind_heart'); // Love emoji + 25+ words about love
+        }
       }
       
       // Reset form
