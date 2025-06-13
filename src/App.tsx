@@ -133,7 +133,7 @@ const handleBadgeEarned = (badgeId: string) => {
         console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
         setCurrentScreen('challenge-complete');
         setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
-        setProgress(loadProgress()); // Refresh progress state
+        setProgress(updatedProgress); // Use the already updated state
         
         // Reset tracking states for immediately awarded badges
         setReflectoRookieMessageCount(0);
