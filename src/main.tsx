@@ -12,3 +12,5 @@ createRoot(document.getElementById('root')!).render(
 
 // Expose for testing purposes
 (window as any).skipToChallenge = skipToChallenge;
+console.log('skipToChallenge function exposed globally.');
+
