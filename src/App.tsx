@@ -132,14 +132,12 @@ const handleBadgeEarned = (badgeId: string) => {
     const awardedBadgeId = checkAndUpdateBadges(badgeId, updatedProgress);
     
     if (awardedBadgeId) {
-      // Special handling for Goal Getter badge
+      // Special handling for Goal Getter badge - make it pending
       if (awardedBadgeId === 'goal_getter') {
-        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! Keep it up!");
-        setCurrentScreen('challenges');
-        setChallengesSubScreen('next-challenge');
-        setShowGoalGetterCard(true);
+        setPendingAwardedBadge(awardedBadgeId);
+        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! I'll show you your special badge when you're ready!");
         setProgress(loadProgress()); // Refresh progress state
-        return; // Exit early to show the special card
+        return; // Exit early - badge will be shown when user navigates away
       }
       
       // Special handling for Reflecto Rookie - make it pending to avoid interrupting chat
@@ -233,10 +231,19 @@ const handleBadgeEarned = (badgeId: string) => {
   const handleLogoClick = () => {
     // Check for pending badge awards first
     if (pendingAwardedBadge) {
-      setNewlyEarnedBadge(pendingAwardedBadge);
+      const badgeToAward = pendingAwardedBadge;
+      setNewlyEarnedBadge(badgeToAward);
       console.log('Challenge complete screen should show now');
-        setCurrentScreen('challenge-complete');
-      setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      setCurrentScreen('challenge-complete');
+      
+      // Customize robot speech based on badge type
+      if (badgeToAward === 'goal_getter') {
+        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! That's amazing - you're doing such great work!");
+      } else if (badgeToAward === 'reflecto_rookie') {
+        setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
+      } else {
+        setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      }
       
       // Update persistent progress for the pending badge (deactivate challenge, increment index)
       const currentProgress = loadProgress();
@@ -280,10 +287,19 @@ const handleBadgeEarned = (badgeId: string) => {
   const handleNavButtonClick = (screen: 'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges') => {
     // Check for pending badge awards first
     if (pendingAwardedBadge) {
-      setNewlyEarnedBadge(pendingAwardedBadge);
+      const badgeToAward = pendingAwardedBadge;
+      setNewlyEarnedBadge(badgeToAward);
       console.log('Challenge complete screen should show now');
-        setCurrentScreen('challenge-complete');
-      setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      setCurrentScreen('challenge-complete');
+      
+      // Customize robot speech based on badge type
+      if (badgeToAward === 'goal_getter') {
+        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! That's amazing - you're doing such great work!");
+      } else if (badgeToAward === 'reflecto_rookie') {
+        setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
+      } else {
+        setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      }
       
       // Update persistent progress for the pending badge (deactivate challenge, increment index)
       const currentProgress = loadProgress();
@@ -365,10 +381,19 @@ const handleBadgeEarned = (badgeId: string) => {
   const handleSectionClose = (sectionName: string) => {
     // Check for pending badge awards first
     if (pendingAwardedBadge) {
-      setNewlyEarnedBadge(pendingAwardedBadge);
+      const badgeToAward = pendingAwardedBadge;
+      setNewlyEarnedBadge(badgeToAward);
       console.log('Challenge complete screen should show now');
-        setCurrentScreen('challenge-complete');
-      setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      setCurrentScreen('challenge-complete');
+      
+      // Customize robot speech based on badge type
+      if (badgeToAward === 'goal_getter') {
+        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! That's amazing - you're doing such great work!");
+      } else if (badgeToAward === 'reflecto_rookie') {
+        setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
+      } else {
+        setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      }
       
       // Update persistent progress for the pending badge (deactivate challenge, increment index)
       const currentProgress = loadProgress();
