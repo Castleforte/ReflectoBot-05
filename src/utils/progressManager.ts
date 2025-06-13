@@ -28,6 +28,7 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     returnDays: [today],
     pdfExportCount: 0,
     whatIfPromptViews: 0,
+    whatIfPromptsAnswered: 0,
     historyViews: 0,
     drawingsSaved: 0,
     colorsUsedInDrawing: 0,
@@ -56,7 +57,8 @@ export const loadProgress = (): ReflectoBotProgress => {
         challengeActive: parsed.challengeActive ?? false,
         currentChallengeIndex: parsed.currentChallengeIndex ?? 0,
         stayPositiveMessageCount: parsed.stayPositiveMessageCount ?? 0,
-        hasLongMessageSent: parsed.hasLongMessageSent ?? false
+        hasLongMessageSent: parsed.hasLongMessageSent ?? false,
+        whatIfPromptsAnswered: parsed.whatIfPromptsAnswered ?? 0
       };
     }
   } catch (error) {
@@ -90,6 +92,8 @@ export function checkCustomBadgeConditions(badgeId: string, progress: ReflectoBo
       return (progress.stayPositiveMessageCount >= 3);
     case 'deep_thinker':
       return (progress.hasLongMessageSent);
+    case 'what_if_explorer':
+      return (progress.whatIfPromptsAnswered >= 3);
     default:
       return false;
   }
@@ -189,7 +193,7 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
         conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
         break;
       case 'what_if_explorer':
-        conditionMet = progress.whatIfPromptViews >= 3;
+        conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
         break;
       case 'super_star':
         conditionMet = progress.badgeCount >= 17;
@@ -377,6 +381,7 @@ export const resetSpecificBadge = (badgeId: string): boolean => {
         break;
       case 'what_if_explorer':
         updatedProgress.whatIfPromptViews = 0;
+        updatedProgress.whatIfPromptsAnswered = 0;
         break;
       case 'good_listener':
         updatedProgress.historyViews = 0;

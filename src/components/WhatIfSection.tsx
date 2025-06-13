@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { whatIfPrompts } from '../whatIfPrompts';
+import { updateProgress } from '../utils/progressManager';
 
 interface WhatIfSectionProps {
   onClose: () => void;
@@ -31,7 +32,7 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningfulAct
     // Track meaningful action for Focus Finder
     onMeaningfulAction();
 
-    // Track badge progress for viewing What If prompts
+    // Track badge progress for viewing What If prompts (for viewing count)
     onBadgeEarned('what_if_explorer');
   };
 
@@ -62,12 +63,20 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningfulAct
     const trimmedText = whatIfText.trim();
     if (!trimmedText) return;
 
+    // Update progress to track answered prompts
+    updateProgress({ 
+      whatIfPromptsAnswered: (prev) => prev.whatIfPromptsAnswered + 1 
+    });
+
     // TODO: Save the response or handle it as needed
     // For now, we'll just show a confirmation in the robot speech
     setRobotSpeech("Wow! I love your creative thinking! That's such an imaginative answer. Want to try another What If question?");
     
     // Track meaningful action for Focus Finder
     onMeaningfulAction();
+
+    // Track badge progress for answering What If prompts
+    onBadgeEarned('what_if_explorer');
     
     // Clear the input
     setWhatIfText('');

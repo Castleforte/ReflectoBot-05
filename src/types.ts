@@ -44,6 +44,7 @@ export interface ReflectoBotProgress {
   returnDays: string[];
   pdfExportCount: 0;
   whatIfPromptViews: number;
+  whatIfPromptsAnswered: number;
   historyViews: number;
   drawingsSaved: number;
   colorsUsedInDrawing: number;

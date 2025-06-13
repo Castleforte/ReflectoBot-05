@@ -68,7 +68,7 @@ export const allBadges: Badge[] = [
   {
     id: 'what_if_explorer',
     name: 'What If Explorer',
-    description: 'View 3 What If prompts',
+    description: 'Answer 3 What If prompts',
     icon: '/badges/WhatIfExplorer.png',
     colorIcon: '/badges/WhatIfExplorer.png',
     earned: false
@@ -199,7 +199,7 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'what_if_explorer_challenge',
     title: 'What If Explorer Challenge',
-    description: 'Explore your imagination by viewing 3 different What If prompts.\nLet your creativity run wild!',
+    description: 'Explore your imagination by answering 3 different What If prompts.\nLet your creativity run wild!',
     badgeId: 'what_if_explorer'
   },
   {
