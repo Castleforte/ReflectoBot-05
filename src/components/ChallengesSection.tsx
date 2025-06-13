@@ -10,12 +10,11 @@ interface ChallengesSectionProps {
   onClose: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   initialSubScreen?: 'next-challenge' | 'my-badges';
-  newlyEarnedBadgeId?: string | null;
 }
 
 type ChallengeScreen = 'next-challenge' | 'challenge-complete' | 'my-badges';
 
-function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-challenge', newlyEarnedBadgeId }: ChallengesSectionProps) {
+function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-challenge' }: ChallengesSectionProps) {
   const [currentScreen, setCurrentScreen] = useState<ChallengeScreen>(initialSubScreen);
   const [progress, setProgress] = useState<ReflectoBotProgress>(loadProgress());
   const [newlyEarnedBadge, setNewlyEarnedBadge] = useState<string | null>(null);
@@ -77,12 +76,6 @@ function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-c
         break;
       case 'stay_positive':
         setRobotSpeech("Let's spread some positivity! Go to Chat and share some encouraging thoughts with me.");
-        break;
-      case 'goal_getter':
-        setRobotSpeech("You're so close to earning the Goal Getter badge! Complete one more challenge to reach your goal!");
-        break;
-      case 'super_star':
-        setRobotSpeech("This is it! Complete this final challenge to become a true ReflectoBot Super Star!");
         break;
       default:
         setRobotSpeech("Great choice! Go explore and complete your challenge. I believe in you!");
@@ -165,7 +158,6 @@ function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-c
           progress={progress}
           onNextChallenge={handleNextChallenge}
           onMyBadges={handleMyBadges}
-          newlyEarnedBadgeId={newlyEarnedBadge}
         />
       )}
       
@@ -173,7 +165,6 @@ function ChallengesSection({ onClose, setRobotSpeech, initialSubScreen = 'next-c
         <MyBadgesPage
           progress={progress}
           onNextChallenge={handleBackToNextChallenge}
-          newlyEarnedBadgeId={newlyEarnedBadgeId}
         />
       )}
     </div>
