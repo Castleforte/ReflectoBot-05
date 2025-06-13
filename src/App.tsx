@@ -166,11 +166,6 @@ const handleBadgeEarned = (badgeId: string) => {
         setCurrentScreen('challenge-complete');
         setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
         setProgress(loadProgress()); // Refresh progress state
-        
-        // After awarding any badge, check for cumulative badges
-        setTimeout(() => {
-          checkCumulativeBadges();
-        }, 100);
       }
     }
   };
@@ -368,6 +363,11 @@ const handleBadgeEarned = (badgeId: string) => {
     setChallengesSubScreen('next-challenge');
     setNewlyEarnedBadge(null);
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
+    
+    // Check for cumulative badges after dismissing the completion page
+    setTimeout(() => {
+      checkCumulativeBadges();
+    }, 100);
   };
 
   const handleMyBadgesFromApp = () => {
@@ -376,6 +376,11 @@ const handleBadgeEarned = (badgeId: string) => {
     setNewlyEarnedBadge(null);
     // Navigate to My Badges page within challenges section
     setRobotSpeech(`Wow! You've already earned ${progress.badgeCount} badges! Just ${18 - progress.badgeCount} more to unlock the full set. Keep going!`);
+    
+    // Check for cumulative badges after dismissing the completion page
+    setTimeout(() => {
+      checkCumulativeBadges();
+    }, 100);
   };
 
   const handleSectionClose = (sectionName: string) => {
