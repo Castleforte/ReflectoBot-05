@@ -148,8 +148,8 @@ const handleBadgeEarned = (badgeId: string) => {
         return; // Exit early to show the special card
       }
       
-      // Only Focus Finder, Stay Positive, What If Explorer, and Super Star should be pending badges
-      if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive' || awardedBadgeId === 'what_if_explorer' || awardedBadgeId === 'super_star') {
+      // Only Super Star should be a pending badge now
+      if (awardedBadgeId === 'super_star') {
         setPendingAwardedBadge(awardedBadgeId);
         // Do NOT change screen or robot speech here. The display will be delayed.
         
