@@ -293,3 +293,24 @@ export const resetSpecificBadge = (badgeId: string): boolean => {
   console.log(`Badge "${badgeId}" has been reset successfully.`);
   return true;
 };
+
+// Function to skip to a specific challenge for testing purposes
+export const skipToChallenge = (targetBadgeId: string): void => {
+  const progress = loadProgress();
+  const targetIndex = badgeQueue.indexOf(targetBadgeId);
+
+  if (targetIndex === -1) {
+    console.error(`Badge ID "${targetBadgeId}" not found in badgeQueue.`);
+    return;
+  }
+
+  const updatedProgress = {
+    ...progress,
+    currentChallengeIndex: targetIndex,
+    challengeActive: false, // Deactivate current challenge so user can start the new one
+  };
+
+  saveProgress(updatedProgress);
+  console.log(`Skipped to challenge for badge: ${targetBadgeId}. Current challenge index is now ${targetIndex}.`);
+  alert(`Skipped to "${targetBadgeId}" challenge. Please refresh the page to see changes.`);
+};
