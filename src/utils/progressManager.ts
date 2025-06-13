@@ -156,9 +156,8 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     const updatedBadges = { ...progress.badges, [triggeredBadgeId]: true };
     const newBadgeCount = progress.badgeCount + 1;
     
-    // For focus_finder, stay_positive, what_if_explorer, goal_getter, and super_star badges, don't update challenge state here
-    // This will be handled in App.tsx when the completion screen is displayed
-    if (triggeredBadgeId === 'focus_finder' || triggeredBadgeId === 'stay_positive' || triggeredBadgeId === 'what_if_explorer' || triggeredBadgeId === 'goal_getter' || triggeredBadgeId === 'super_star') {
+    // For special badges that need delayed handling, don't update challenge state here
+    if (triggeredBadgeId === 'goal_getter' || triggeredBadgeId === 'super_star') {
       const updatedProgress = {
         ...progress,
         badges: updatedBadges,
