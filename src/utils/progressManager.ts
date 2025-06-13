@@ -27,6 +27,7 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     currentChallengeIndex: 0,
     stayPositiveMessageCount: 0,
     hasLongMessageSent: false,
+    hasLongPositiveMessage: false,
     kindHeartWordCount: 0
   };
 };
@@ -46,6 +47,7 @@ export const loadProgress = (): ReflectoBotProgress => {
         currentChallengeIndex: parsed.currentChallengeIndex ?? 0,
         stayPositiveMessageCount: parsed.stayPositiveMessageCount ?? 0,
         hasLongMessageSent: parsed.hasLongMessageSent ?? false,
+        hasLongPositiveMessage: parsed.hasLongPositiveMessage ?? false,
         whatIfPromptsAnswered: parsed.whatIfPromptsAnswered ?? 0,
         kindHeartWordCount: parsed.kindHeartWordCount ?? 0
       };
@@ -129,7 +131,7 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
       conditionMet = progress.readItToMeUsed >= 1;
       break;
     case 'stay_positive':
-      conditionMet = progress.stayPositiveMessageCount >= 3;
+      conditionMet = progress.stayPositiveMessageCount >= 3 && progress.hasLongPositiveMessage;
       break;
     case 'good_listener':
       conditionMet = progress.historyViews >= 3;

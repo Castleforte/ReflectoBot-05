@@ -100,7 +100,7 @@ export const allBadges: Badge[] = [
   {
     id: 'stay_positive',
     name: 'Stay Positive',
-    description: 'Select a happy emoji',
+    description: 'Select a happy emoji and write 15+ words about what makes you happy',
     icon: '/badges/StayPositive.png',
     colorIcon: '/badges/StayPositive.png',
     earned: false
@@ -223,7 +223,7 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'stay_positive_challenge',
     title: 'Stay Positive Challenge',
-    description: 'Find something that makes you happy today and select the happy emoji.\nPositivity is a superpower!',
+    description: 'Find something that makes you happy today, select the happy emoji, and write at least 15 words about what makes you happy.\nPositivity is a superpower!',
     badgeId: 'stay_positive'
   },
   {

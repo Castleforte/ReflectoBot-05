@@ -11,7 +11,6 @@ interface ChatSectionProps {
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   onBadgeEarned: (badgeId: string) => void;
   onMeaningfulAction: () => void;
-  onStayPositiveProgress?: () => void;
 }
 
 function ChatSection({ 
@@ -21,8 +20,7 @@ function ChatSection({
   onShowChatHistory, 
   setRobotSpeech, 
   onBadgeEarned, 
-  onMeaningfulAction,
-  onStayPositiveProgress
+  onMeaningfulAction
 }: ChatSectionProps) {
   const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
   const [chatInputText, setChatInputText] = useState<string>('');
@@ -127,14 +125,41 @@ function ChatSection({
     // Track meaningful action for Focus Finder
     onMeaningfulAction();
 
+    // Load current progress and update it
+    const currentProgress = loadProgress();
+    const wordCount = trimmedMessage.split(/\s+/).filter(word => word.length > 0).length;
+    
+    // Prepare progress updates
+    let progressUpdates: any = {
+      chatMessageCount: currentProgress.chatMessageCount + 1
+    };
+
+    // Check for long message (15+ words)
+    if (wordCount >= 15) {
+      progressUpdates.hasLongMessageSent = true;
+    }
+
+    // Check for positive message and Stay Positive challenge
+    if (isPositiveMessage(trimmedMessage)) {
+      // Check if Stay Positive challenge is active
+      if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 12) { // stay_positive is at index 12
+        progressUpdates.stayPositiveMessageCount = currentProgress.stayPositiveMessageCount + 1;
+        
+        // If this is a long positive message (15+ words), mark it
+        if (wordCount >= 15) {
+          progressUpdates.hasLongPositiveMessage = true;
+        }
+      }
+    }
+
+    // Update progress with all changes
+    updateProgress(progressUpdates);
+
     // Track badge progress
     onBadgeEarned('reflecto_rookie'); // Track message for Reflecto Rookie
     
     // Check for specific badge conditions
-    if (trimmedMessage.split(/\s+/).length >= 15) {
-      // Update progress to mark that a long message has been sent
-      const currentProgress = loadProgress();
-      updateProgress({ hasLongMessageSent: true });
+    if (wordCount >= 15) {
       onBadgeEarned('deep_thinker'); // 15+ words badge
     }
     
@@ -146,18 +171,9 @@ function ChatSection({
       onBadgeEarned('truth_spotter'); // Contains "I realized" badge
     }
 
-    // Check for positive messages for Stay Positive badge
-    if (isPositiveMessage(trimmedMessage)) {
-      // Get current progress to check if Stay Positive challenge is active
-      const currentProgress = loadProgress();
-      if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 5) {
-        onBadgeEarned('stay_positive');
-      }
-    }
-
-    // Trigger progress checks
-    if (onStayPositiveProgress) {
-      onStayPositiveProgress();
+    // Check for Stay Positive badge
+    if (isPositiveMessage(trimmedMessage) && currentProgress.challengeActive && currentProgress.currentChallengeIndex === 12) {
+      onBadgeEarned('stay_positive');
     }
     
     // TODO: Replace this logic with actual GPT API call in the future

@@ -59,6 +59,7 @@ export interface ReflectoBotProgress {
   currentChallengeIndex: number;
   stayPositiveMessageCount: number;
   hasLongMessageSent: boolean;
+  hasLongPositiveMessage: boolean;
   kindHeartWordCount: number;
 }
 

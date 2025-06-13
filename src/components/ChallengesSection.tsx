@@ -85,7 +85,7 @@ function ChallengesSection({
         setRobotSpeech("Time to focus! Pick any section and stay there for at least 90 seconds while being active. No switching allowed!");
         break;
       case 'stay_positive':
-        setRobotSpeech("Let's spread some positivity! Go to Chat and share some encouraging thoughts with me.");
+        setRobotSpeech("Let's spread some positivity! Go to Chat and share at least 15 words about what makes you happy.");
         break;
       default:
         setRobotSpeech("Great choice! Go explore and complete your challenge. I believe in you!");

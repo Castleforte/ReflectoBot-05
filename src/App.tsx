@@ -35,9 +35,6 @@ function App() {
   const [focusFinderStartTime, setFocusFinderStartTime] = useState<number | null>(null);
   const [focusFinderPage, setFocusFinderPage] = useState<string | null>(null);
 
-  // Stay Positive tracking state
-  const [stayPositiveMessageCount, setStayPositiveMessageCount] = useState(0);
-
   // Track daily visit on component mount
   useEffect(() => {
     const updatedProgress = trackDailyVisit();
@@ -112,10 +109,7 @@ const handleBadgeEarned = (badgeId: string) => {
         updatedProgress.focusedChallengeCompleted = true;
         break;
       case 'stay_positive':
-        if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 12) { // stay_positive is at index 12
-          setStayPositiveMessageCount(prev => prev + 1);
-          updatedProgress.stayPositiveMessageCount = updatedProgress.stayPositiveMessageCount + 1;
-        }
+        // Progress is already updated in ChatSection.tsx
         break;
       case 'great_job':
         updatedProgress.pdfExportCount = Math.max(updatedProgress.pdfExportCount, 1);
@@ -167,9 +161,6 @@ const handleBadgeEarned = (badgeId: string) => {
         setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
         setProgress(loadProgress()); // Refresh progress state
         
-        // Reset tracking states for immediately awarded badges
-        setStayPositiveMessageCount(0);
-        
         // After awarding any badge, check for cumulative badges
         setTimeout(() => {
           checkCumulativeBadges();
@@ -197,15 +188,6 @@ const handleBadgeEarned = (badgeId: string) => {
       if (timeSpent >= 90000) { // 90 seconds
         handleBadgeEarned('focus_finder');
       }
-    }
-  };
-
-  const checkStayPositiveConditions = () => {
-    const currentProgress = loadProgress();
-    if (currentProgress.challengeActive && 
-        currentProgress.currentChallengeIndex === 12 && // stay_positive is at index 12
-        stayPositiveMessageCount >= 3) {
-      handleBadgeEarned('stay_positive');
     }
   };
 
@@ -259,9 +241,8 @@ const handleBadgeEarned = (badgeId: string) => {
       updateProgress(updatedProgress);
       setProgress(updatedProgress); // Update local state
       
-      // Reset pending badge and tracking states
+      // Reset pending badge
       setPendingAwardedBadge(null);
-      setStayPositiveMessageCount(0);
       
       // After handling pending badge, check for cumulative badges
       setTimeout(() => {
@@ -272,7 +253,6 @@ const handleBadgeEarned = (badgeId: string) => {
     }
 
     checkFocusFinderConditions(); // Check before navigation
-    checkStayPositiveConditions(); // Check before navigation
     checkWhatIfExplorerConditions(); // Check before navigation
     
     if (currentScreen === 'settings') {
@@ -308,9 +288,8 @@ const handleBadgeEarned = (badgeId: string) => {
       updateProgress(updatedProgress);
       setProgress(updatedProgress); // Update local state
       
-      // Reset pending badge and tracking states
+      // Reset pending badge
       setPendingAwardedBadge(null);
-      setStayPositiveMessageCount(0);
       
       // After handling pending badge, check for cumulative badges
       setTimeout(() => {
@@ -321,7 +300,6 @@ const handleBadgeEarned = (badgeId: string) => {
     }
 
     checkFocusFinderConditions(); // Check before navigation
-    checkStayPositiveConditions(); // Check before navigation
     checkWhatIfExplorerConditions(); // Check before navigation
     
     setCurrentScreen(screen);
@@ -395,9 +373,8 @@ const handleBadgeEarned = (badgeId: string) => {
       updateProgress(updatedProgress);
       setProgress(updatedProgress); // Update local state
       
-      // Reset pending badge and tracking states
+      // Reset pending badge
       setPendingAwardedBadge(null);
-      setStayPositiveMessageCount(0);
       
       // After handling pending badge, check for cumulative badges
       setTimeout(() => {
@@ -408,7 +385,6 @@ const handleBadgeEarned = (badgeId: string) => {
     }
 
     checkFocusFinderConditions(); // Check before closing
-    checkStayPositiveConditions(); // Check before closing
     checkWhatIfExplorerConditions(); // Check before closing
     
     setCurrentScreen('welcome');
@@ -532,12 +508,6 @@ const handleBadgeEarned = (badgeId: string) => {
             setRobotSpeech={setRobotSpeech}
             onBadgeEarned={handleBadgeEarned}
             onMeaningfulAction={handleMeaningfulAction}
-            onStayPositiveProgress={() => {
-              // Check Stay Positive conditions after each message
-              setTimeout(() => {
-                checkStayPositiveConditions();
-              }, 100);
-            }}
           />
         ) : currentScreen === 'daily-checkin' ? (
           <DailyCheckInSection 
