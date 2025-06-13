@@ -3,6 +3,19 @@ import { allBadges, badgeQueue } from '../badgeData';
 
 const STORAGE_KEY = 'reflectobot_progress';
 
+// Define badges that should be awarded immediately when conditions are met
+const instantBadges = [
+  'brave_voice',
+  'truth_spotter', 
+  'kind_heart',
+  'deep_thinker',
+  'boost_buddy',
+  'great_job',
+  'good_listener',
+  'creative_spark',
+  'resilient'
+];
+
 export const getInitialProgress = (): ReflectoBotProgress => {
   const today = new Date().toDateString();
   return {
@@ -82,96 +95,53 @@ export function checkCustomBadgeConditions(badgeId: string, progress: ReflectoBo
   }
 }
 
-// New badge checking system with gatekeeping rules
+// Enhanced badge checking system with instant vs challenge badge logic
 export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: ReflectoBotProgress): string | null => {
-  // Only award badges if challenge is active
-  if (!progress.challengeActive) {
+  // Don't award if badge is already earned
+  if (progress.badges[triggeredBadgeId]) {
     return null;
   }
 
-  // Get the expected badge based on current challenge index
-  const expectedBadgeId = badgeQueue[progress.currentChallengeIndex];
+  const isInstantBadge = instantBadges.includes(triggeredBadgeId);
   
-  // Only award if the triggered badge matches the expected badge
-  if (triggeredBadgeId !== expectedBadgeId) {
-    return null;
-  }
-
-  // Check if badge condition is met
-  let conditionMet = false;
-  
-  switch (triggeredBadgeId) {
-    case 'calm_creator':
-      conditionMet = progress.drawingsSaved >= 1;
-      break;
-    case 'mood_mapper':
-      conditionMet = progress.moodCheckInCount >= 3;
-      break;
-    case 'bounce_back':
-      conditionMet = progress.undoCount >= 3;
-      break;
-    case 'reflecto_rookie':
-      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
-      break;
-    case 'focus_finder':
-      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
-      break;
-    case 'stay_positive':
-      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
-      break;
-    case 'great_job':
-      conditionMet = progress.pdfExportCount >= 1;
-      break;
-    case 'brave_voice':
-      // Condition already verified by calling component
-      conditionMet = true;
-      break;
-    case 'what_if_explorer':
-      conditionMet = progress.whatIfPromptViews >= 3;
-      break;
-    case 'truth_spotter':
-      // Condition already verified by calling component
-      conditionMet = true;
-      break;
-    case 'kind_heart':
-      // Condition already verified by calling component
-      conditionMet = true;
-      break;
-    case 'super_star':
-      conditionMet = progress.badgeCount >= 17;
-      break;
-    case 'goal_getter':
-      conditionMet = progress.challengesCompleted >= 5;
-      break;
-    case 'good_listener':
-      conditionMet = progress.historyViews >= 3;
-      break;
-    case 'creative_spark':
-      conditionMet = progress.colorsUsedInDrawing >= 5;
-      break;
-    case 'deep_thinker':
-      conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
-      break;
-    case 'boost_buddy':
-      // Condition already verified by calling component
-      conditionMet = true;
-      break;
-    case 'resilient':
-      conditionMet = progress.returnDays.length >= 3;
-      break;
-    default:
-      return null;
-  }
-
-  // If condition is met and badge not already earned
-  if (conditionMet && !progress.badges[triggeredBadgeId]) {
-    // Award the badge
-    const updatedBadges = { ...progress.badges, [triggeredBadgeId]: true };
-    const newBadgeCount = progress.badgeCount + 1;
+  if (isInstantBadge) {
+    // Instant badges: Award immediately when conditions are met
+    let conditionMet = false;
     
-    // For focus_finder and stay_positive badges, don't update challenge state here
-    // This will be handled in App.tsx when the completion screen is displayed
-    if (triggeredBadgeId === 'focus_finder' || triggeredBadgeId === 'stay_positive') {
+    switch (triggeredBadgeId) {
+      case 'brave_voice':
+      case 'truth_spotter':
+      case 'kind_heart':
+        // Conditions already verified by calling component
+        conditionMet = true;
+        break;
+      case 'deep_thinker':
+        conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
+        break;
+      case 'boost_buddy':
+        conditionMet = progress.readItToMeUsed >= 1;
+        break;
+      case 'great_job':
+        conditionMet = progress.pdfExportCount >= 1;
+        break;
+      case 'good_listener':
+        conditionMet = progress.historyViews >= 3;
+        break;
+      case 'creative_spark':
+        conditionMet = progress.colorsUsedInDrawing >= 5;
+        break;
+      case 'resilient':
+        conditionMet = progress.returnDays.length >= 3;
+        break;
+      default:
+        return null;
+    }
+
+    if (conditionMet) {
+      // Award instant badge without modifying challenge state
+      const updatedBadges = { ...progress.badges, [triggeredBadgeId]: true };
+      const newBadgeCount = progress.badgeCount + 1;
+      
       const updatedProgress = {
         ...progress,
         badges: updatedBadges,
@@ -181,20 +151,89 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
       saveProgress(updatedProgress);
       updateBadgeCounterDisplay(newBadgeCount);
       return triggeredBadgeId;
-    } else {
-      // For all other badges, update challenge state immediately
-      const updatedProgress = {
-        ...progress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...progress.earnedBadges, triggeredBadgeId],
-        challengeActive: false,
-        currentChallengeIndex: Math.min(progress.currentChallengeIndex + 1, badgeQueue.length - 1),
-        challengesCompleted: progress.challengesCompleted + 1
-      };
-      saveProgress(updatedProgress);
-      updateBadgeCounterDisplay(newBadgeCount);
-      return triggeredBadgeId;
+    }
+  } else {
+    // Challenge badges: Only award if challenge is active and matches expected badge
+    if (!progress.challengeActive) {
+      return null;
+    }
+
+    // Get the expected badge based on current challenge index
+    const expectedBadgeId = badgeQueue[progress.currentChallengeIndex];
+    
+    // Only award if the triggered badge matches the expected badge
+    if (triggeredBadgeId !== expectedBadgeId) {
+      return null;
+    }
+
+    // Check if badge condition is met
+    let conditionMet = false;
+    
+    switch (triggeredBadgeId) {
+      case 'calm_creator':
+        conditionMet = progress.drawingsSaved >= 1;
+        break;
+      case 'mood_mapper':
+        conditionMet = progress.moodCheckInCount >= 3;
+        break;
+      case 'bounce_back':
+        conditionMet = progress.undoCount >= 3;
+        break;
+      case 'reflecto_rookie':
+        conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
+        break;
+      case 'focus_finder':
+        conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
+        break;
+      case 'stay_positive':
+        conditionMet = checkCustomBadgeConditions(triggeredBadgeId, progress);
+        break;
+      case 'what_if_explorer':
+        conditionMet = progress.whatIfPromptViews >= 3;
+        break;
+      case 'super_star':
+        conditionMet = progress.badgeCount >= 17;
+        break;
+      case 'goal_getter':
+        conditionMet = progress.challengesCompleted >= 5;
+        break;
+      default:
+        return null;
+    }
+
+    // If condition is met and badge not already earned
+    if (conditionMet) {
+      // Award the badge
+      const updatedBadges = { ...progress.badges, [triggeredBadgeId]: true };
+      const newBadgeCount = progress.badgeCount + 1;
+      
+      // For focus_finder, stay_positive, and what_if_explorer badges, don't update challenge state here
+      // This will be handled in App.tsx when the completion screen is displayed
+      if (triggeredBadgeId === 'focus_finder' || triggeredBadgeId === 'stay_positive' || triggeredBadgeId === 'what_if_explorer') {
+        const updatedProgress = {
+          ...progress,
+          badges: updatedBadges,
+          badgeCount: newBadgeCount,
+          earnedBadges: [...progress.earnedBadges, triggeredBadgeId]
+        };
+        saveProgress(updatedProgress);
+        updateBadgeCounterDisplay(newBadgeCount);
+        return triggeredBadgeId;
+      } else {
+        // For all other challenge badges, update challenge state immediately
+        const updatedProgress = {
+          ...progress,
+          badges: updatedBadges,
+          badgeCount: newBadgeCount,
+          earnedBadges: [...progress.earnedBadges, triggeredBadgeId],
+          challengeActive: false,
+          currentChallengeIndex: Math.min(progress.currentChallengeIndex + 1, badgeQueue.length - 1),
+          challengesCompleted: progress.challengesCompleted + 1
+        };
+        saveProgress(updatedProgress);
+        updateBadgeCounterDisplay(newBadgeCount);
+        return triggeredBadgeId;
+      }
     }
   }
 

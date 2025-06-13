@@ -34,10 +34,6 @@ function App() {
   const [focusFinderStartTime, setFocusFinderStartTime] = useState<number | null>(null);
   const [focusFinderPage, setFocusFinderPage] = useState<string | null>(null);
 
-  // Reflecto Rookie tracking state
-  const [reflectoRookieMessageCount, setReflectoRookieMessageCount] = useState(0);
-  const [reflectoRookieHasLongMessage, setReflectoRookieHasLongMessage] = useState(false);
-
   // Stay Positive tracking state
   const [stayPositiveMessageCount, setStayPositiveMessageCount] = useState(0);
 
@@ -45,6 +41,9 @@ function App() {
   useEffect(() => {
     const updatedProgress = trackDailyVisit();
     setProgress(updatedProgress);
+    
+    // Check for resilient badge after tracking daily visit
+    handleBadgeEarned('resilient');
   }, []);
 
   // UPDATED BADGE LOGIC
@@ -65,21 +64,7 @@ const handleBadgeEarned = (badgeId: string) => {
         updatedProgress.undoCount = Math.max(updatedProgress.undoCount, 3);
         break;
       case 'reflecto_rookie':
-        // Track message count for Reflecto Rookie
-        if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 3) { // reflecto_rookie is at index 3
-          setReflectoRookieMessageCount(prev => prev + 1);
-          updatedProgress.chatMessageCount = updatedProgress.chatMessageCount + 1;
-        }
-        break;
-      case 'stay_positive':
-        // Track positive messages for Stay Positive badge
-        if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 5) { // stay_positive is at index 5
-          setStayPositiveMessageCount(prev => prev + 1);
-          updatedProgress.stayPositiveMessageCount = updatedProgress.stayPositiveMessageCount + 1;
-        }
-        break;
-      case 'great_job':
-        updatedProgress.pdfExportCount = Math.max(updatedProgress.pdfExportCount, 1);
+        updatedProgress.chatMessageCount = updatedProgress.chatMessageCount + 1;
         break;
       case 'brave_voice':
         // Don't set badge directly - let checkAndUpdateBadges handle it
@@ -100,17 +85,25 @@ const handleBadgeEarned = (badgeId: string) => {
         updatedProgress.colorsUsedInDrawing = Math.max(updatedProgress.colorsUsedInDrawing, 5);
         break;
       case 'deep_thinker':
-        // Track long messages for Deep Thinker
-        updatedProgress.hasLongMessageSent = true;
-        if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 3) { // reflecto_rookie is at index 3
-          setReflectoRookieHasLongMessage(true);
-        }
+        // Progress is already updated in ChatSection.tsx
         break;
       case 'boost_buddy':
         updatedProgress.readItToMeUsed = Math.max(updatedProgress.readItToMeUsed, 1);
         break;
       case 'focus_finder':
         updatedProgress.focusedChallengeCompleted = true;
+        break;
+      case 'stay_positive':
+        if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 5) { // stay_positive is at index 5
+          setStayPositiveMessageCount(prev => prev + 1);
+          updatedProgress.stayPositiveMessageCount = updatedProgress.stayPositiveMessageCount + 1;
+        }
+        break;
+      case 'great_job':
+        updatedProgress.pdfExportCount = Math.max(updatedProgress.pdfExportCount, 1);
+        break;
+      case 'resilient':
+        // Progress is already updated by trackDailyVisit
         break;
     }
 
@@ -126,7 +119,7 @@ const handleBadgeEarned = (badgeId: string) => {
         setPendingAwardedBadge(awardedBadgeId);
         // Do NOT change screen or robot speech here. The display will be delayed.
       } else {
-        // For all other badges (including Brave Voice), immediately show the complete page
+        // For all other badges, immediately show the complete page
         console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
         setNewlyEarnedBadge(awardedBadgeId);
         console.log('Challenge complete screen should show now');
@@ -136,8 +129,6 @@ const handleBadgeEarned = (badgeId: string) => {
         setProgress(loadProgress()); // Refresh progress state
         
         // Reset tracking states for immediately awarded badges
-        setReflectoRookieMessageCount(0);
-        setReflectoRookieHasLongMessage(false);
         setStayPositiveMessageCount(0);
       }
     }
@@ -162,16 +153,6 @@ const handleBadgeEarned = (badgeId: string) => {
       if (timeSpent >= 90000) { // 90 seconds
         handleBadgeEarned('focus_finder');
       }
-    }
-  };
-
-  const checkReflectoRookieConditions = () => {
-    const currentProgress = loadProgress();
-    if (currentProgress.challengeActive && 
-        currentProgress.currentChallengeIndex === 3 && // reflecto_rookie is at index 3
-        reflectoRookieMessageCount >= 2 && 
-        reflectoRookieHasLongMessage) {
-      handleBadgeEarned('reflecto_rookie');
     }
   };
 
@@ -214,15 +195,12 @@ const handleBadgeEarned = (badgeId: string) => {
       
       // Reset pending badge and tracking states
       setPendingAwardedBadge(null);
-      setReflectoRookieMessageCount(0);
-      setReflectoRookieHasLongMessage(false);
       setStayPositiveMessageCount(0);
       
       return; // Stop further navigation in this handler to show the completion page
     }
 
     checkFocusFinderConditions(); // Check before navigation
-    checkReflectoRookieConditions(); // Check before navigation
     checkStayPositiveConditions(); // Check before navigation
     checkWhatIfExplorerConditions(); // Check before navigation
     
@@ -261,15 +239,12 @@ const handleBadgeEarned = (badgeId: string) => {
       
       // Reset pending badge and tracking states
       setPendingAwardedBadge(null);
-      setReflectoRookieMessageCount(0);
-      setReflectoRookieHasLongMessage(false);
       setStayPositiveMessageCount(0);
       
       return; // Stop further navigation in this handler to show the completion page
     }
 
     checkFocusFinderConditions(); // Check before navigation
-    checkReflectoRookieConditions(); // Check before navigation
     checkStayPositiveConditions(); // Check before navigation
     checkWhatIfExplorerConditions(); // Check before navigation
     
@@ -346,15 +321,12 @@ const handleBadgeEarned = (badgeId: string) => {
       
       // Reset pending badge and tracking states
       setPendingAwardedBadge(null);
-      setReflectoRookieMessageCount(0);
-      setReflectoRookieHasLongMessage(false);
       setStayPositiveMessageCount(0);
       
       return; // Stop further navigation in this handler to show the completion page
     }
 
     checkFocusFinderConditions(); // Check before closing
-    checkReflectoRookieConditions(); // Check before closing
     checkStayPositiveConditions(); // Check before closing
     checkWhatIfExplorerConditions(); // Check before closing
     
@@ -479,12 +451,6 @@ const handleBadgeEarned = (badgeId: string) => {
             setRobotSpeech={setRobotSpeech}
             onBadgeEarned={handleBadgeEarned}
             onMeaningfulAction={handleMeaningfulAction}
-            onReflectoRookieProgress={() => {
-              // Check Reflecto Rookie conditions after each message
-              setTimeout(() => {
-                checkReflectoRookieConditions();
-              }, 100);
-            }}
             onStayPositiveProgress={() => {
               // Check Stay Positive conditions after each message
               setTimeout(() => {

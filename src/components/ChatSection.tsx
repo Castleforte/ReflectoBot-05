@@ -11,7 +11,6 @@ interface ChatSectionProps {
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   onBadgeEarned: (badgeId: string) => void;
   onMeaningfulAction: () => void;
-  onReflectoRookieProgress?: () => void;
   onStayPositiveProgress?: () => void;
 }
 
@@ -23,7 +22,6 @@ function ChatSection({
   setRobotSpeech, 
   onBadgeEarned, 
   onMeaningfulAction,
-  onReflectoRookieProgress,
   onStayPositiveProgress
 }: ChatSectionProps) {
   const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
@@ -158,9 +156,6 @@ function ChatSection({
     }
 
     // Trigger progress checks
-    if (onReflectoRookieProgress) {
-      onReflectoRookieProgress();
-    }
     if (onStayPositiveProgress) {
       onStayPositiveProgress();
     }
