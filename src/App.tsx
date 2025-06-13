@@ -604,6 +604,6 @@ const handleBadgeEarned = (badgeId: string) => {
     </div>
   );
 }
-
+// Debug: Triggering rebuild for badge award logic test
 export default App;
 // Trigger rebuild - minor comment
