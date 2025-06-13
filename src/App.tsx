@@ -121,8 +121,8 @@ const handleBadgeEarned = (badgeId: string) => {
     const awardedBadgeId = checkAndUpdateBadges(badgeId, updatedProgress);
     
     if (awardedBadgeId) {
-      // Only Focus Finder and Stay Positive should be pending badges
-      if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive') {
+      // Only Focus Finder, Stay Positive, and What If Explorer should be pending badges
+      if (awardedBadgeId === 'focus_finder' || awardedBadgeId === 'stay_positive' || awardedBadgeId === 'what_if_explorer') {
         setPendingAwardedBadge(awardedBadgeId);
         // Do NOT change screen or robot speech here. The display will be delayed.
       } else {
@@ -184,6 +184,15 @@ const handleBadgeEarned = (badgeId: string) => {
     }
   };
 
+  const checkWhatIfExplorerConditions = () => {
+    const currentProgress = loadProgress();
+    if (currentProgress.challengeActive && 
+        currentProgress.currentChallengeIndex === 8 && // what_if_explorer is at index 8
+        currentProgress.whatIfPromptViews >= 3) {
+      handleBadgeEarned('what_if_explorer');
+    }
+  };
+
   const handleLogoClick = () => {
     // Check for pending badge awards first
     if (pendingAwardedBadge) {
@@ -215,6 +224,7 @@ const handleBadgeEarned = (badgeId: string) => {
     checkFocusFinderConditions(); // Check before navigation
     checkReflectoRookieConditions(); // Check before navigation
     checkStayPositiveConditions(); // Check before navigation
+    checkWhatIfExplorerConditions(); // Check before navigation
     
     if (currentScreen === 'settings') {
       setCurrentScreen('welcome');
@@ -261,6 +271,7 @@ const handleBadgeEarned = (badgeId: string) => {
     checkFocusFinderConditions(); // Check before navigation
     checkReflectoRookieConditions(); // Check before navigation
     checkStayPositiveConditions(); // Check before navigation
+    checkWhatIfExplorerConditions(); // Check before navigation
     
     setCurrentScreen(screen);
     
@@ -345,6 +356,7 @@ const handleBadgeEarned = (badgeId: string) => {
     checkFocusFinderConditions(); // Check before closing
     checkReflectoRookieConditions(); // Check before closing
     checkStayPositiveConditions(); // Check before closing
+    checkWhatIfExplorerConditions(); // Check before closing
     
     setCurrentScreen('welcome');
     setRobotSpeech("Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!");
@@ -606,4 +618,3 @@ const handleBadgeEarned = (badgeId: string) => {
 }
 // Debug: Triggering rebuild for badge award logic test
 export default App;
-// Trigger rebuild - minor comment
