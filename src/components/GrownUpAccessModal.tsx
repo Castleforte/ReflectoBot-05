@@ -9,13 +9,15 @@ interface GrownUpAccessModalProps {
 
 function GrownUpAccessModal({ onClose, onBadgeEarned }: GrownUpAccessModalProps) {
   const handleDownloadSessionSummary = () => {
-    // Update progress for great_job badge
-    const currentProgress = loadProgress();
-    updateProgress({ 
-      pdfExportCount: currentProgress.pdfExportCount + 1 
-    });
+    console.log('PDF export completed');
     
-    // Track PDF export
+    // Immediately update the export count
+    const progress = loadProgress();
+    updateProgress({ pdfExportCount: progress.pdfExportCount + 1 });
+    
+    console.log('Current PDF export count:', progress.pdfExportCount + 1);
+    
+    // Immediately check for Great Job badge
     onBadgeEarned('great_job');
     
     // TODO: Implement actual session summary download
