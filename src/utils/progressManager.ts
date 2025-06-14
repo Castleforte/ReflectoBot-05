@@ -73,6 +73,11 @@ export const loadProgress = (): ReflectoBotProgress => {
 export const saveProgress = (progress: ReflectoBotProgress): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    console.log('✅ Progress saved to localStorage:', {
+      challengesCompleted: progress.challengesCompleted,
+      badgeCount: progress.badgeCount,
+      goalGetterEarned: progress.badges['goal_getter']
+    });
   } catch (error) {
     console.error('Error saving progress:', error);
   }
@@ -145,11 +150,12 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
   }
 };
 
-// Award a badge and update progress
+// Award a badge and update progress - ⛏️ CONFIRMED: This persists progress immediately
 export const awardBadge = (badgeId: string): ReflectoBotProgress => {
   const progress = loadProgress();
   
-  console.log(`Awarding badge: ${badgeId}`);
+  console.log(`🏆 Awarding badge: ${badgeId}`);
+  console.log(`📊 Current challengesCompleted BEFORE award: ${progress.challengesCompleted}`);
   
   // Don't award if already earned
   if (progress.badges[badgeId]) {
@@ -169,33 +175,42 @@ export const awardBadge = (badgeId: string): ReflectoBotProgress => {
   
   // If this is a challenge badge (not a reward badge), advance the challenge
   if (badgeQueue.includes(badgeId)) {
-    console.log(`Advancing challenge after awarding ${badgeId}`);
+    console.log(`📈 Advancing challenge after awarding ${badgeId}`);
     updatedProgress = {
       ...updatedProgress,
       challengeActive: false,
       currentChallengeIndex: Math.min(progress.currentChallengeIndex + 1, badgeQueue.length - 1),
       challengesCompleted: progress.challengesCompleted + 1
     };
+    console.log(`📊 NEW challengesCompleted AFTER award: ${updatedProgress.challengesCompleted}`);
   }
   
+  // ⛏️ CRITICAL: Save progress immediately and confirm it's persisted
   saveProgress(updatedProgress);
   updateBadgeCounterDisplay(newBadgeCount);
+  
+  // 🔍 VERIFICATION: Log fresh progress from localStorage to confirm persistence
+  const verifyProgress = loadProgress();
+  console.log(`🔍 VERIFICATION - Fresh progress challengesCompleted: ${verifyProgress.challengesCompleted}`);
+  
   return updatedProgress;
 };
 
-// 🎯 FIXED: Check and award Goal Getter badge - now checks AFTER badge is awarded
+// 🎯 FIXED: Check and award Goal Getter badge - now re-reads fresh progress state
 export const checkGoalGetterBadge = (): boolean => {
+  // 🎯 CRITICAL: Re-read fresh progress state to ensure Focus Finder progress is detected
   const progress = loadProgress();
   
   console.log(`🎯 Checking Goal Getter: challengesCompleted=${progress.challengesCompleted}, hasGoalGetter=${progress.badges['goal_getter']}`);
   
-  // 🎯 CRITICAL FIX: Check if we just completed the 5th challenge (Focus Finder)
+  // 🎯 Check if we just completed the 5th challenge (Focus Finder should have updated challengesCompleted to 5)
   if (progress.challengesCompleted >= 5 && !progress.badges['goal_getter']) {
     console.log('🎯 Goal Getter condition met - awarding badge');
     awardBadge('goal_getter');
     return true;
   }
   
+  console.log('❌ Goal Getter condition NOT met');
   return false;
 };
 
