@@ -115,13 +115,16 @@ function App() {
       setCurrentScreen('challenge-complete');
       setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
       
-      // 🎯 CRITICAL FIX: Check for Goal Getter after Focus Finder (5th challenge)
+      // 🎯 CRITICAL FIX: Check for Goal Getter AFTER Focus Finder is awarded
       if (badgeToAward === 'focus_finder') {
         console.log('🎯 Focus Finder awarded - checking for Goal Getter eligibility');
-        if (checkGoalGetterBadge()) {
-          console.log('🎯 Goal Getter badge eligible - setting pending flag');
-          setPendingGoalGetter(true);
-        }
+        // Use setTimeout to ensure the badge award is fully processed first
+        setTimeout(() => {
+          if (checkGoalGetterBadge()) {
+            console.log('🎯 Goal Getter badge eligible - setting pending flag');
+            setPendingGoalGetter(true);
+          }
+        }, 100);
       }
       
       // Check for Super Star after any badge (but not immediately)

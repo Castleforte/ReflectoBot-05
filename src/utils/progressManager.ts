@@ -183,14 +183,15 @@ export const awardBadge = (badgeId: string): ReflectoBotProgress => {
   return updatedProgress;
 };
 
-// Check and award Goal Getter badge
+// 🎯 FIXED: Check and award Goal Getter badge - now checks AFTER badge is awarded
 export const checkGoalGetterBadge = (): boolean => {
   const progress = loadProgress();
   
-  console.log(`Checking Goal Getter: challengesCompleted=${progress.challengesCompleted}, hasGoalGetter=${progress.badges['goal_getter']}`);
+  console.log(`🎯 Checking Goal Getter: challengesCompleted=${progress.challengesCompleted}, hasGoalGetter=${progress.badges['goal_getter']}`);
   
+  // 🎯 CRITICAL FIX: Check if we just completed the 5th challenge (Focus Finder)
   if (progress.challengesCompleted >= 5 && !progress.badges['goal_getter']) {
-    console.log('Awarding Goal Getter badge');
+    console.log('🎯 Goal Getter condition met - awarding badge');
     awardBadge('goal_getter');
     return true;
   }
