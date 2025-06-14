@@ -18,9 +18,6 @@ import {
   updateProgress, 
   awardBadge,
   checkBadgeCondition,
-  addPendingBadge,
-  getPendingBadges,
-  clearPendingBadges,
   startFocusTracking,
   trackFocusEngagement,
   checkFocusFinderCompletion,
@@ -52,7 +49,7 @@ function App() {
 
   // Handle section navigation and tracking
   const handleSectionEnter = (section: string) => {
-    console.log(`Entering section: ${section}`);
+    console.log(`🚀 Entering section: ${section}`);
     
     // Track section visit for resilient badge
     trackSectionVisit(section);
@@ -66,45 +63,49 @@ function App() {
 
   // Handle section exit and check for pending badges
   const handleSectionExit = (fromSection: string) => {
-    console.log(`Exiting section: ${fromSection}`);
+    console.log(`🚪 Exiting section: ${fromSection}`);
     
     const currentProgress = loadProgress();
-    console.log('Current progress on exit:', currentProgress);
+    console.log('📊 Current progress on exit:', {
+      challengeActive: currentProgress.challengeActive,
+      currentChallengeIndex: currentProgress.currentChallengeIndex,
+      currentBadge: badgeQueue[currentProgress.currentChallengeIndex]
+    });
+    
+    let badgeToAward: string | null = null;
     
     // Check Focus Finder completion if leaving a tracked page
     if (currentProgress.focusPage === fromSection && checkFocusFinderCompletion()) {
-      console.log('Focus Finder completed! Adding to pending badges.');
-      addPendingBadge('focus_finder');
+      console.log('✅ Focus Finder completed!');
+      badgeToAward = 'focus_finder';
     }
     
     // Check for current challenge badge completion
-    if (currentProgress.challengeActive) {
+    if (currentProgress.challengeActive && !badgeToAward) {
       const currentBadgeId = badgeQueue[currentProgress.currentChallengeIndex];
-      console.log(`Checking badge condition for: ${currentBadgeId}`);
+      console.log(`🔍 Checking badge condition for: ${currentBadgeId}`);
       
       if (currentBadgeId && checkBadgeCondition(currentBadgeId, loadProgress())) {
-        console.log(`Badge condition met for: ${currentBadgeId}. Adding to pending badges.`);
-        addPendingBadge(currentBadgeId);
+        console.log(`✅ Badge condition met for: ${currentBadgeId}`);
+        badgeToAward = currentBadgeId;
       }
     }
     
     // Check resilient badge (visit all 4 sections)
-    const updatedProgress = loadProgress();
-    if (updatedProgress.visitedSections.length >= 4 && 
-        updatedProgress.challengeActive && 
-        badgeQueue[updatedProgress.currentChallengeIndex] === 'resilient') {
-      console.log('Resilient badge condition met! Adding to pending badges.');
-      addPendingBadge('resilient');
+    if (!badgeToAward) {
+      const updatedProgress = loadProgress();
+      if (updatedProgress.visitedSections.length >= 4 && 
+          updatedProgress.challengeActive && 
+          badgeQueue[updatedProgress.currentChallengeIndex] === 'resilient') {
+        console.log('✅ Resilient badge condition met!');
+        badgeToAward = 'resilient';
+      }
     }
     
-    // Process any pending badges
-    const pendingBadges = getPendingBadges();
-    console.log('Pending badges:', pendingBadges);
-    
-    if (pendingBadges.length > 0) {
-      // Award the first pending badge
-      const badgeToAward = pendingBadges[0];
-      console.log(`Awarding badge: ${badgeToAward}`);
+    // Award badge and show congratulations screen
+    if (badgeToAward) {
+      console.log(`🏆 Awarding badge: ${badgeToAward}`);
+      console.log(`✅ Showing Congrats screen for: ${badgeToAward}`);
       
       const finalProgress = awardBadge(badgeToAward);
       setProgress(finalProgress);
@@ -112,14 +113,11 @@ function App() {
       setCurrentScreen('challenge-complete');
       setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
       
-      // Clear remaining pending badges
-      clearPendingBadges();
-      
       // Check for Goal Getter after awarding Focus Finder (5th challenge)
       if (badgeToAward === 'focus_finder') {
         setTimeout(() => {
           if (checkGoalGetterBadge()) {
-            console.log('Goal Getter badge awarded!');
+            console.log('🎯 Goal Getter badge awarded!');
             setCurrentScreen('goal-getter');
             setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
           }
@@ -129,11 +127,13 @@ function App() {
       // Check for Super Star after any badge
       setTimeout(() => {
         if (checkSuperStarBadge()) {
-          console.log('Super Star badge awarded!');
+          console.log('⭐ Super Star badge awarded!');
           setCurrentScreen('super-star');
           setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
         }
       }, 200);
+    } else {
+      console.log('❌ No badge to award on exit');
     }
   };
 
@@ -146,13 +146,13 @@ function App() {
   const handleBadgeEarned = (badgeId: string) => {
     const currentProgress = loadProgress();
     
-    console.log(`Badge earned trigger: ${badgeId}`);
+    console.log(`🎯 Badge earned trigger: ${badgeId}`);
     console.log('Challenge active:', currentProgress.challengeActive);
     console.log('Current challenge index:', currentProgress.currentChallengeIndex);
     
     // Only process if challenge is active
     if (!currentProgress.challengeActive) {
-      console.log('No active challenge, ignoring badge trigger');
+      console.log('❌ No active challenge, ignoring badge trigger');
       return;
     }
     
@@ -160,14 +160,14 @@ function App() {
     console.log('Expected badge:', expectedBadgeId);
     
     if (badgeId !== expectedBadgeId) {
-      console.log('Badge does not match expected challenge, ignoring');
+      console.log('❌ Badge does not match expected challenge, ignoring');
       return;
     }
     
     // For content-based badges that should be awarded immediately when detected
     if (badgeId === 'brave_voice' || badgeId === 'truth_spotter') {
-      console.log(`Adding content-based badge to pending: ${badgeId}`);
-      addPendingBadge(badgeId);
+      console.log(`🏆 Content-based badge detected: ${badgeId} - will award on section exit`);
+      // These will be caught by the section exit logic
     }
   };
 
