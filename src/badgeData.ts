@@ -243,22 +243,17 @@ export const challengeDetails: Challenge[] = [
     title: 'Resilient Challenge',
     description: 'Show your commitment by returning to ReflectoBot on different days.\nConsistency is the key to growth!',
     badgeId: 'resilient'
-  },
-  {
-    id: 'super_star_challenge',
-    title: 'Super Star Challenge',
-    description: 'Achieve greatness by earning all other badges.\nYou\'re truly a ReflectoBot superstar!',
-    badgeId: 'super_star'
   }
 ];
 
-// Badge queue in the corrected order - goal_getter removed, focus_finder moved to position 5
+// Badge queue - CORRECTED: Removed goal_getter and super_star (they are reward badges, not challenges)
+// Focus Finder is now at position 5 (index 4)
 export const badgeQueue = [
   'calm_creator',      // Challenge 1
   'mood_mapper',       // Challenge 2
   'bounce_back',       // Challenge 3
   'reflecto_rookie',   // Challenge 4
-  'focus_finder',      // Challenge 5 (moved from position 6)
+  'focus_finder',      // Challenge 5 (moved here)
   'great_job',         // Challenge 6
   'brave_voice',       // Challenge 7
   'what_if_explorer',  // Challenge 8
@@ -269,6 +264,6 @@ export const badgeQueue = [
   'good_listener',     // Challenge 13
   'creative_spark',    // Challenge 14
   'deep_thinker',      // Challenge 15
-  'resilient',         // Challenge 16
-  'super_star'         // Challenge 17
+  'resilient'          // Challenge 16
+  // goal_getter and super_star are NOT in the queue - they are reward badges
 ];
