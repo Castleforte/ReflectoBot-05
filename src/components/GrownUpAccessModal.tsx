@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { updateProgress, loadProgress } from '../utils/progressManager';
 
 interface GrownUpAccessModalProps {
   onClose: () => void;
@@ -8,6 +9,12 @@ interface GrownUpAccessModalProps {
 
 function GrownUpAccessModal({ onClose, onBadgeEarned }: GrownUpAccessModalProps) {
   const handleDownloadSessionSummary = () => {
+    // Update progress for great_job badge
+    const currentProgress = loadProgress();
+    updateProgress({ 
+      pdfExportCount: currentProgress.pdfExportCount + 1 
+    });
+    
     // Track PDF export
     onBadgeEarned('great_job');
     

@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { moodData } from '../moodData';
 import { generatePdf } from '../utils/pdfGenerator';
 import { MoodEntry } from '../types';
+import { updateProgress, loadProgress } from '../utils/progressManager';
 
 interface MoodHistoryModalProps {
   onClose: () => void;
@@ -15,6 +16,12 @@ function MoodHistoryModal({ onClose, moodHistory, onBadgeEarned }: MoodHistoryMo
 
   // Track history view when modal opens
   useEffect(() => {
+    // Update progress for good_listener badge
+    const currentProgress = loadProgress();
+    updateProgress({ 
+      historyViews: currentProgress.historyViews + 1 
+    });
+    
     onBadgeEarned('good_listener');
   }, [onBadgeEarned]);
 
@@ -23,10 +30,16 @@ function MoodHistoryModal({ onClose, moodHistory, onBadgeEarned }: MoodHistoryMo
       try {
         await generatePdf(pdfContentRef.current, 'reflectobot-mood-history.pdf');
         
+        // Update progress for great_job badge
+        const currentProgress = loadProgress();
+        updateProgress({ 
+          pdfExportCount: currentProgress.pdfExportCount + 1 
+        });
+        
         // Track PDF export for great_job badge
         onBadgeEarned('great_job');
         
-        // Track mood history download for mood_mapper badge
+        // Track mood history download for mood_mapper badge (additional trigger)
         onBadgeEarned('mood_mapper');
       } catch (error) {
         console.error('Error generating PDF:', error);

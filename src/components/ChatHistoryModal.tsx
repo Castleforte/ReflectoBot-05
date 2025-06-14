@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { generatePdf } from '../utils/pdfGenerator';
 import { ConversationTurn } from '../types';
+import { updateProgress, loadProgress } from '../utils/progressManager';
 
 interface ChatHistoryModalProps {
   onClose: () => void;
@@ -14,6 +15,12 @@ function ChatHistoryModal({ onClose, chatHistory, onBadgeEarned }: ChatHistoryMo
 
   // Track history view when modal opens
   useEffect(() => {
+    // Update progress for good_listener badge
+    const currentProgress = loadProgress();
+    updateProgress({ 
+      historyViews: currentProgress.historyViews + 1 
+    });
+    
     onBadgeEarned('good_listener');
   }, [onBadgeEarned]);
 
@@ -21,6 +28,12 @@ function ChatHistoryModal({ onClose, chatHistory, onBadgeEarned }: ChatHistoryMo
     if (pdfContentRef.current) {
       try {
         await generatePdf(pdfContentRef.current, 'reflectobot-chat-history.pdf');
+        
+        // Update progress for great_job badge
+        const currentProgress = loadProgress();
+        updateProgress({ 
+          pdfExportCount: currentProgress.pdfExportCount + 1 
+        });
         
         // Track PDF export
         onBadgeEarned('great_job');

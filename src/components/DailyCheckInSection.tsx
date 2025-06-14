@@ -84,9 +84,29 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
       // Track engagement for Focus Finder
       onEngagement();
 
+      // Update progress for mood_mapper badge
+      const currentProgress = loadProgress();
+      updateProgress({ 
+        moodCheckInCount: currentProgress.moodCheckInCount + 1 
+      });
+
+      // Check for mood_mapper badge
+      onBadgeEarned('mood_mapper');
+
       // Check for specific mood badges
       if (selectedMood === 'happy') {
-        onBadgeEarned('stay_positive'); // Happy emoji badge
+        // For Stay Positive badge, check if the message is 15+ words about happiness
+        const trimmedText = checkInText.trim();
+        const wordCount = trimmedText.split(/\s+/).filter(word => word.length > 0).length;
+        
+        if (wordCount >= 15) {
+          // Update progress for stay_positive badge
+          updateProgress({ 
+            stayPositiveMessageCount: currentProgress.stayPositiveMessageCount + 1,
+            hasLongPositiveMessage: true
+          });
+          onBadgeEarned('stay_positive');
+        }
       }
       
       if (selectedMood === 'love') {
@@ -102,7 +122,6 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
         
         if (containsLoveContent && wordCount >= 25) {
           // Update progress with the word count
-          const currentProgress = loadProgress();
           updateProgress({ 
             kindHeartWordCount: Math.max(currentProgress.kindHeartWordCount, wordCount)
           });

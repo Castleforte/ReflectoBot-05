@@ -57,6 +57,12 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned, onEngagement }:
       // Track engagement for Focus Finder
       onEngagement();
 
+      // Update progress for boost_buddy badge
+      const currentProgress = loadProgress();
+      updateProgress({ 
+        readItToMeUsed: currentProgress.readItToMeUsed + 1 
+      });
+
       // Track badge progress for using Read It to Me
       onBadgeEarned('boost_buddy');
     }
