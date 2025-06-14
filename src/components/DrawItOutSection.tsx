@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import DrawingPreviewModal from './DrawingPreviewModal';
+import { updateProgress, loadProgress } from '../utils/progressManager';
 
 interface DrawItOutSectionProps {
   onClose: () => void;
@@ -199,6 +200,15 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onEngagement
 
     // Track engagement for Focus Finder
     onEngagement();
+
+    // Update progress for bounce_back badge
+    const currentProgress = loadProgress();
+    updateProgress({ 
+      undoCount: currentProgress.undoCount + 1 
+    });
+
+    // Check for bounce_back badge
+    onBadgeEarned('bounce_back');
   };
 
   const handleRedo = () => {
@@ -243,18 +253,22 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onEngagement
     setShowDrawingPreview(false);
     setRobotSpeech("Perfect! Your drawing has been saved to your device. You're such a talented artist!");
 
+    // Update progress for calm_creator badge
+    const currentProgress = loadProgress();
+    updateProgress({ 
+      drawingsSaved: currentProgress.drawingsSaved + 1 
+    });
+
     // Track drawing save for calm_creator badge
     onBadgeEarned('calm_creator');
     
     // Track colors used for creative_spark badge
     if (usedColors.size >= 5) {
+      const updatedProgress = loadProgress();
+      updateProgress({ 
+        colorsUsedInDrawing: Math.max(updatedProgress.colorsUsedInDrawing, usedColors.size)
+      });
       onBadgeEarned('creative_spark');
-    }
-
-    // Track bounce_back badge if undo was used this session
-    if (hasUsedUndoThisSession) {
-      onBadgeEarned('bounce_back');
-      setHasUsedUndoThisSession(false); // Reset for next drawing session
     }
 
     // Reset used colors for next drawing
