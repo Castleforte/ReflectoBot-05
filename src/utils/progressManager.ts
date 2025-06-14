@@ -28,7 +28,8 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     stayPositiveMessageCount: 0,
     hasLongMessageSent: false,
     hasLongPositiveMessage: false,
-    kindHeartWordCount: 0
+    kindHeartWordCount: 0,
+    goalGetterAcknowledged: false
   };
 };
 
@@ -49,7 +50,8 @@ export const loadProgress = (): ReflectoBotProgress => {
         hasLongMessageSent: parsed.hasLongMessageSent ?? false,
         hasLongPositiveMessage: parsed.hasLongPositiveMessage ?? false,
         whatIfPromptsAnswered: parsed.whatIfPromptsAnswered ?? 0,
-        kindHeartWordCount: parsed.kindHeartWordCount ?? 0
+        kindHeartWordCount: parsed.kindHeartWordCount ?? 0,
+        goalGetterAcknowledged: parsed.goalGetterAcknowledged ?? false
       };
     }
   } catch (error) {
