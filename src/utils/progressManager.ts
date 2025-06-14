@@ -113,7 +113,7 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     case 'calm_creator':
       return progress.drawingsSaved >= 1;
     case 'mood_mapper':
-      return progress.moodCheckInCount >= 3;
+      return progress.moodCheckInCount >= 1; // ✅ FIXED: Only need 1 check-in with 25+ words
     case 'bounce_back':
       return progress.undoCount >= 3;
     case 'reflecto_rookie':

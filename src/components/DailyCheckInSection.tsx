@@ -84,6 +84,13 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
       // Track engagement for Focus Finder
       onEngagement();
 
+      // ✅ FIXED: Check word count for Mood Mapper badge
+      const trimmedText = checkInText.trim();
+      const wordCount = trimmedText.split(/\s+/).filter(word => word.length > 0).length;
+      
+      console.log(`📝 Mood check-in submitted: "${trimmedText}"`);
+      console.log(`📊 Word count: ${wordCount}`);
+
       // ✅ FIXED: Update progress for mood_mapper badge IMMEDIATELY after submission
       const currentProgress = loadProgress();
       console.log('🧠 Mood Check-In Count BEFORE:', currentProgress.moodCheckInCount);
@@ -96,15 +103,15 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
       console.log('🧠 Mood Check-In Count AFTER:', updatedProgress.moodCheckInCount);
       console.log('🟢 Mood Mapper badge earned?', updatedProgress.badges['mood_mapper']);
 
-      // ✅ Check for mood_mapper badge - will be awarded on section exit
-      onBadgeEarned('mood_mapper');
+      // ✅ Check for mood_mapper badge if word count is 25+
+      if (wordCount >= 25) {
+        console.log('✅ Mood Mapper condition met (25+ words)');
+        onBadgeEarned('mood_mapper');
+      }
 
       // Check for specific mood badges
       if (selectedMood === 'happy') {
         // For Stay Positive badge, check if the message is 15+ words about happiness
-        const trimmedText = checkInText.trim();
-        const wordCount = trimmedText.split(/\s+/).filter(word => word.length > 0).length;
-        
         if (wordCount >= 15) {
           // Update progress for stay_positive badge
           updateProgress({ 
@@ -117,8 +124,6 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
       
       if (selectedMood === 'love') {
         // For Kind Heart badge, check if the message contains love-related content and is 25+ words
-        const trimmedText = checkInText.trim();
-        const wordCount = trimmedText.split(/\s+/).filter(word => word.length > 0).length;
         
         // Check if the message contains love-related keywords
         const loveKeywords = ['love', 'adore', 'cherish', 'treasure', 'appreciate', 'care', 'heart', 'affection', 'dear', 'precious'];

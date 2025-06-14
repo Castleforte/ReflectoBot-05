@@ -12,7 +12,7 @@ export const allBadges: Badge[] = [
   {
     id: 'mood_mapper',
     name: 'Mood Mapper',
-    description: 'Complete 3 mood check-ins',
+    description: 'Choose an emoji and write 25+ words about that feeling',
     icon: '/badges/MoodMapper.png',
     colorIcon: '/badges/MoodMapper.png',
     earned: false
@@ -157,7 +157,7 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'mood_mapper_challenge',
     title: 'Mood Mapper Challenge',
-    description: 'Track your emotions today with emojis. How many different\nones did you feel? What made them change?',
+    description: 'Choose an emoji and write at least 25 words about that feeling.\nExpress yourself and explore your emotions!',
     badgeId: 'mood_mapper'
   },
   {
