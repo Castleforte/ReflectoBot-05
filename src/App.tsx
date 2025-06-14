@@ -37,6 +37,8 @@ function App() {
   const [moodHistory, setMoodHistory] = useState<MoodEntry[]>([]);
   const [progress, setProgress] = useState<ReflectoBotProgress>(loadProgress());
   const [newlyEarnedBadge, setNewlyEarnedBadge] = useState<string | null>(null);
+  const [pendingGoalGetter, setPendingGoalGetter] = useState<boolean>(false);
+  const [pendingSuperStar, setPendingSuperStar] = useState<boolean>(false);
   const [robotSpeech, setRobotSpeech] = useState<string>(
     "Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!"
   );
@@ -113,23 +115,20 @@ function App() {
       setCurrentScreen('challenge-complete');
       setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
       
-      // Check for Goal Getter after awarding Focus Finder (5th challenge)
+      // 🎯 CRITICAL FIX: Check for Goal Getter after Focus Finder (5th challenge)
       if (badgeToAward === 'focus_finder') {
-        setTimeout(() => {
-          if (checkGoalGetterBadge()) {
-            console.log('🎯 Goal Getter badge awarded!');
-            setCurrentScreen('goal-getter');
-            setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
-          }
-        }, 100);
+        console.log('🎯 Focus Finder awarded - checking for Goal Getter eligibility');
+        if (checkGoalGetterBadge()) {
+          console.log('🎯 Goal Getter badge eligible - setting pending flag');
+          setPendingGoalGetter(true);
+        }
       }
       
-      // Check for Super Star after any badge
+      // Check for Super Star after any badge (but not immediately)
       setTimeout(() => {
         if (checkSuperStarBadge()) {
           console.log('⭐ Super Star badge awarded!');
-          setCurrentScreen('super-star');
-          setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
+          setPendingSuperStar(true);
         }
       }, 200);
       
@@ -234,14 +233,54 @@ function App() {
     }
   };
 
+  // 🎯 CRITICAL FIX: Handle Next Challenge button with pending Goal Getter check
   const handleNextChallengeFromApp = () => {
+    // Check for pending Goal Getter FIRST
+    if (pendingGoalGetter) {
+      console.log('🎯 Pending Goal Getter detected - showing Goal Getter screen');
+      setPendingGoalGetter(false);
+      setCurrentScreen('goal-getter');
+      setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
+      return;
+    }
+    
+    // Check for pending Super Star
+    if (pendingSuperStar) {
+      console.log('⭐ Pending Super Star detected - showing Super Star screen');
+      setPendingSuperStar(false);
+      setCurrentScreen('super-star');
+      setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
+      return;
+    }
+    
+    // Normal next challenge flow
     setCurrentScreen('challenges');
     setChallengesSubScreen('next-challenge');
     setNewlyEarnedBadge(null);
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
   };
 
+  // 🎯 CRITICAL FIX: Handle My Badges button with pending Goal Getter check
   const handleMyBadgesFromApp = () => {
+    // Check for pending Goal Getter FIRST
+    if (pendingGoalGetter) {
+      console.log('🎯 Pending Goal Getter detected - showing Goal Getter screen');
+      setPendingGoalGetter(false);
+      setCurrentScreen('goal-getter');
+      setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
+      return;
+    }
+    
+    // Check for pending Super Star
+    if (pendingSuperStar) {
+      console.log('⭐ Pending Super Star detected - showing Super Star screen');
+      setPendingSuperStar(false);
+      setCurrentScreen('super-star');
+      setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
+      return;
+    }
+    
+    // Normal my badges flow
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
     setNewlyEarnedBadge(null);
@@ -252,6 +291,16 @@ function App() {
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
     setRobotSpeech(`Amazing! You've earned the Goal Getter badge! You now have ${progress.badgeCount} badges total. Keep going for more!`);
+    
+    // Check for pending Super Star after Goal Getter
+    if (pendingSuperStar) {
+      setTimeout(() => {
+        console.log('⭐ Pending Super Star detected after Goal Getter - showing Super Star screen');
+        setPendingSuperStar(false);
+        setCurrentScreen('super-star');
+        setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
+      }, 1000);
+    }
   };
 
   const handleSuperStarCollect = () => {
