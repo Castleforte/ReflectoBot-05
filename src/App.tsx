@@ -61,8 +61,8 @@ function App() {
     setProgress(loadProgress());
   };
 
-  // Handle section exit and check for pending badges
-  const handleSectionExit = (fromSection: string) => {
+  // Handle section exit and check for pending badges - RETURNS BOOLEAN
+  const handleSectionExit = (fromSection: string): boolean => {
     console.log(`🚪 Exiting section: ${fromSection}`);
     
     const currentProgress = loadProgress();
@@ -132,8 +132,11 @@ function App() {
           setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
         }
       }, 200);
+      
+      return true; // ✅ BADGE WAS AWARDED - STOP NAVIGATION
     } else {
       console.log('❌ No badge to award on exit');
+      return false; // ❌ NO BADGE - CONTINUE NAVIGATION
     }
   };
 
@@ -172,7 +175,12 @@ function App() {
   };
 
   const handleLogoClick = () => {
-    handleSectionExit(currentScreen);
+    // ✅ CHECK FOR BADGE AWARD FIRST - STOP IF BADGE AWARDED
+    const badgeAwarded = handleSectionExit(currentScreen);
+    if (badgeAwarded) {
+      console.log('🛑 Badge awarded - stopping logo navigation');
+      return;
+    }
     
     if (currentScreen === 'settings') {
       setCurrentScreen('welcome');
@@ -184,7 +192,12 @@ function App() {
   };
 
   const handleNavButtonClick = (screen: 'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges') => {
-    handleSectionExit(currentScreen);
+    // ✅ CHECK FOR BADGE AWARD FIRST - STOP IF BADGE AWARDED
+    const badgeAwarded = handleSectionExit(currentScreen);
+    if (badgeAwarded) {
+      console.log('🛑 Badge awarded - stopping navigation');
+      return;
+    }
     
     setCurrentScreen(screen);
     handleSectionEnter(screen);
@@ -246,7 +259,13 @@ function App() {
   };
 
   const handleSectionClose = (sectionName: string) => {
-    handleSectionExit(sectionName);
+    // ✅ CHECK FOR BADGE AWARD FIRST - STOP IF BADGE AWARDED
+    const badgeAwarded = handleSectionExit(sectionName);
+    if (badgeAwarded) {
+      console.log('🛑 Badge awarded - stopping section close navigation');
+      return;
+    }
+    
     setCurrentScreen('welcome');
     setRobotSpeech("Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!");
   };
