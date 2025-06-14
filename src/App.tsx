@@ -47,18 +47,56 @@ function App() {
   // Function to check and award cumulative badges (Goal Getter and Super Star)
   const checkCumulativeBadges = () => {
     const currentProgress = loadProgress();
-    const nextBadgeId = badgeQueue[currentProgress.currentChallengeIndex];
     
     // Check for Goal Getter badge (complete 5 challenges)
-    if (nextBadgeId === 'goal_getter' && currentProgress.challengesCompleted >= 5) {
+    if (currentProgress.challengesCompleted >= 5 && !currentProgress.badges['goal_getter']) {
       handleBadgeEarned('goal_getter');
       return; // Exit early to avoid checking Super Star in the same cycle
     }
     
     // Check for Super Star badge (earn all 17 other badges)
-    if (nextBadgeId === 'super_star' && currentProgress.badgeCount >= 17) {
+    if (currentProgress.badgeCount >= 17 && !currentProgress.badges['super_star']) {
       handleBadgeEarned('super_star');
     }
+  };
+
+  // Helper function to display pending badge completion page
+  const handlePendingBadgeDisplay = () => {
+    if (!pendingAwardedBadge) return false;
+
+    const badgeToAward = pendingAwardedBadge;
+    setNewlyEarnedBadge(badgeToAward);
+    console.log('Challenge complete screen should show now');
+    setCurrentScreen('challenge-complete');
+    
+    // Customize robot speech based on badge type
+    if (badgeToAward === 'reflecto_rookie') {
+      setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
+    } else if (badgeToAward === 'super_star') {
+      setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
+    } else {
+      setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+    }
+    
+    // Update persistent progress for the pending badge (deactivate challenge, increment index)
+    const currentProgress = loadProgress();
+    const updatedProgress = {
+      ...currentProgress,
+      challengeActive: false,
+      currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1)
+    };
+    updateProgress(updatedProgress);
+    setProgress(updatedProgress); // Update local state
+    
+    // Reset pending badge
+    setPendingAwardedBadge(null);
+    
+    // After handling pending badge, check for cumulative badges
+    setTimeout(() => {
+      checkCumulativeBadges();
+    }, 100);
+
+    return true; // Indicate that a pending badge was handled
   };
 
   // UPDATED BADGE LOGIC
@@ -132,12 +170,12 @@ const handleBadgeEarned = (badgeId: string) => {
     const awardedBadgeId = checkAndUpdateBadges(badgeId, updatedProgress);
     
     if (awardedBadgeId) {
-      // Special handling for Goal Getter badge - make it pending
+      // Special handling for Goal Getter badge - trigger the special card display
       if (awardedBadgeId === 'goal_getter') {
-        setPendingAwardedBadge(awardedBadgeId);
+        setShowGoalGetterCard(true);
         setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! I'll show you your special badge when you're ready!");
         setProgress(loadProgress()); // Refresh progress state
-        return; // Exit early - badge will be shown when user navigates away
+        return; // Exit early - badge will be shown via special card
       }
       
       // Special handling for Reflecto Rookie - make it pending to avoid interrupting chat
@@ -148,25 +186,22 @@ const handleBadgeEarned = (badgeId: string) => {
         return; // Exit early - badge will be shown when user navigates away
       }
       
-      // Only Super Star should be a pending badge now
+      // Special handling for Super Star - make it pending
       if (awardedBadgeId === 'super_star') {
         setPendingAwardedBadge(awardedBadgeId);
-        // Do NOT change screen or robot speech here. The display will be delayed.
-        
-        // After awarding a pending badge, check for cumulative badges
-        setTimeout(() => {
-          checkCumulativeBadges();
-        }, 100);
-      } else {
-        // For all other badges, immediately show the complete page
-        console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
-        setNewlyEarnedBadge(awardedBadgeId);
-        console.log('Challenge complete screen should show now');
-        console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
-        setCurrentScreen('challenge-complete');
-        setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+        setRobotSpeech("Incredible! You've earned ALL the badges! You're a Super Star! I'll show you your special badge when you're ready!");
         setProgress(loadProgress()); // Refresh progress state
+        return; // Exit early - badge will be shown when user navigates away
       }
+      
+      // For all other badges, immediately show the complete page
+      console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
+      setNewlyEarnedBadge(awardedBadgeId);
+      console.log('Challenge complete screen should show now');
+      console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
+      setCurrentScreen('challenge-complete');
+      setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      setProgress(loadProgress()); // Refresh progress state
     }
   };
 
@@ -207,8 +242,9 @@ const handleBadgeEarned = (badgeId: string) => {
     const updatedProgress = {
       ...currentProgress,
       challengeActive: false,
-      currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1),
-      challengesCompleted: currentProgress.challengesCompleted + 1
+      currentChallengeIndex: badgeQueue.indexOf('great_job'), // Move to great_job challenge
+      challengesCompleted: currentProgress.challengesCompleted + 1,
+      goalGetterAcknowledged: true
     };
     updateProgress(updatedProgress);
     setProgress(updatedProgress); // Update local state
@@ -225,41 +261,8 @@ const handleBadgeEarned = (badgeId: string) => {
 
   const handleLogoClick = () => {
     // Check for pending badge awards first
-    if (pendingAwardedBadge) {
-      const badgeToAward = pendingAwardedBadge;
-      setNewlyEarnedBadge(badgeToAward);
-      console.log('Challenge complete screen should show now');
-      setCurrentScreen('challenge-complete');
-      
-      // Customize robot speech based on badge type
-      if (badgeToAward === 'goal_getter') {
-        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! That's amazing - you're doing such great work!");
-      } else if (badgeToAward === 'reflecto_rookie') {
-        setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
-      } else {
-        setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
-      }
-      
-      // Update persistent progress for the pending badge (deactivate challenge, increment index)
-      const currentProgress = loadProgress();
-      const updatedProgress = {
-        ...currentProgress,
-        challengeActive: false,
-        currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1),
-        challengesCompleted: currentProgress.challengesCompleted + 1
-      };
-      updateProgress(updatedProgress);
-      setProgress(updatedProgress); // Update local state
-      
-      // Reset pending badge
-      setPendingAwardedBadge(null);
-      
-      // After handling pending badge, check for cumulative badges
-      setTimeout(() => {
-        checkCumulativeBadges();
-      }, 100);
-      
-      return; // Stop further navigation in this handler to show the completion page
+    if (handlePendingBadgeDisplay()) {
+      return; // Stop further navigation if a pending badge was displayed
     }
 
     checkFocusFinderConditions(); // Check before navigation
@@ -281,41 +284,8 @@ const handleBadgeEarned = (badgeId: string) => {
 
   const handleNavButtonClick = (screen: 'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges') => {
     // Check for pending badge awards first
-    if (pendingAwardedBadge) {
-      const badgeToAward = pendingAwardedBadge;
-      setNewlyEarnedBadge(badgeToAward);
-      console.log('Challenge complete screen should show now');
-      setCurrentScreen('challenge-complete');
-      
-      // Customize robot speech based on badge type
-      if (badgeToAward === 'goal_getter') {
-        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! That's amazing - you're doing such great work!");
-      } else if (badgeToAward === 'reflecto_rookie') {
-        setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
-      } else {
-        setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
-      }
-      
-      // Update persistent progress for the pending badge (deactivate challenge, increment index)
-      const currentProgress = loadProgress();
-      const updatedProgress = {
-        ...currentProgress,
-        challengeActive: false,
-        currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1),
-        challengesCompleted: currentProgress.challengesCompleted + 1
-      };
-      updateProgress(updatedProgress);
-      setProgress(updatedProgress); // Update local state
-      
-      // Reset pending badge
-      setPendingAwardedBadge(null);
-      
-      // After handling pending badge, check for cumulative badges
-      setTimeout(() => {
-        checkCumulativeBadges();
-      }, 100);
-      
-      return; // Stop further navigation in this handler to show the completion page
+    if (handlePendingBadgeDisplay()) {
+      return; // Stop further navigation if a pending badge was displayed
     }
 
     checkFocusFinderConditions(); // Check before navigation
@@ -385,41 +355,8 @@ const handleBadgeEarned = (badgeId: string) => {
 
   const handleSectionClose = (sectionName: string) => {
     // Check for pending badge awards first
-    if (pendingAwardedBadge) {
-      const badgeToAward = pendingAwardedBadge;
-      setNewlyEarnedBadge(badgeToAward);
-      console.log('Challenge complete screen should show now');
-      setCurrentScreen('challenge-complete');
-      
-      // Customize robot speech based on badge type
-      if (badgeToAward === 'goal_getter') {
-        setRobotSpeech("Wow, five badges already? You're officially a Goal Getter! That's amazing - you're doing such great work!");
-      } else if (badgeToAward === 'reflecto_rookie') {
-        setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
-      } else {
-        setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
-      }
-      
-      // Update persistent progress for the pending badge (deactivate challenge, increment index)
-      const currentProgress = loadProgress();
-      const updatedProgress = {
-        ...currentProgress,
-        challengeActive: false,
-        currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1),
-        challengesCompleted: currentProgress.challengesCompleted + 1
-      };
-      updateProgress(updatedProgress);
-      setProgress(updatedProgress); // Update local state
-      
-      // Reset pending badge
-      setPendingAwardedBadge(null);
-      
-      // After handling pending badge, check for cumulative badges
-      setTimeout(() => {
-        checkCumulativeBadges();
-      }, 100);
-      
-      return; // Stop further navigation in this handler to show the completion page
+    if (handlePendingBadgeDisplay()) {
+      return; // Stop further navigation if a pending badge was displayed
     }
 
     checkFocusFinderConditions(); // Check before closing

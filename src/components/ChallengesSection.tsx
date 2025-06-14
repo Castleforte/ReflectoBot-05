@@ -36,6 +36,11 @@ function ChallengesSection({
 
   // Get the current challenge based on progress
   const getCurrentChallenge = () => {
+    // Check if Goal Getter badge is earned but not acknowledged - prioritize this
+    if (progress.badges['goal_getter'] && !progress.goalGetterAcknowledged) {
+      return challengeDetails.find(challenge => challenge.badgeId === 'goal_getter');
+    }
+    
     // Get the badge ID from the queue based on current index
     const currentBadgeId = badgeQueue[progress.currentChallengeIndex];
     if (!currentBadgeId) return null; // All challenges completed
@@ -153,13 +158,26 @@ function ChallengesSection({
 
   return (
     <div className="challenges-section">
-      {currentScreen === 'next-challenge' && (
+      {/* Show Goal Getter card if it should be displayed */}
+      {showGoalGetterCard && (
         <NextChallengePage
           challenge={currentChallenge}
           onStartChallenge={handleStartChallenge}
           onMyBadges={handleMyBadges}
           progress={progress}
           showGoalGetterCard={showGoalGetterCard}
+          onCollectGoalGetterBadge={onCollectGoalGetterBadge}
+        />
+      )}
+      
+      {/* Regular next challenge page */}
+      {currentScreen === 'next-challenge' && !showGoalGetterCard && (
+        <NextChallengePage
+          challenge={currentChallenge}
+          onStartChallenge={handleStartChallenge}
+          onMyBadges={handleMyBadges}
+          progress={progress}
+          showGoalGetterCard={false}
           onCollectGoalGetterBadge={onCollectGoalGetterBadge}
         />
       )}

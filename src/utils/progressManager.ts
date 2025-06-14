@@ -28,7 +28,8 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     stayPositiveMessageCount: 0,
     hasLongMessageSent: false,
     hasLongPositiveMessage: false,
-    kindHeartWordCount: 0
+    kindHeartWordCount: 0,
+    goalGetterAcknowledged: false
   };
 };
 
@@ -49,7 +50,8 @@ export const loadProgress = (): ReflectoBotProgress => {
         hasLongMessageSent: parsed.hasLongMessageSent ?? false,
         hasLongPositiveMessage: parsed.hasLongPositiveMessage ?? false,
         whatIfPromptsAnswered: parsed.whatIfPromptsAnswered ?? 0,
-        kindHeartWordCount: parsed.kindHeartWordCount ?? 0
+        kindHeartWordCount: parsed.kindHeartWordCount ?? 0,
+        goalGetterAcknowledged: parsed.goalGetterAcknowledged ?? false
       };
     }
   } catch (error) {
@@ -158,8 +160,19 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     const updatedBadges = { ...progress.badges, [triggeredBadgeId]: true };
     const newBadgeCount = progress.badgeCount + 1;
     
-    // For special badges that need delayed handling, don't update challenge state here
-    if (triggeredBadgeId === 'goal_getter' || triggeredBadgeId === 'super_star') {
+    // For Goal Getter badge, don't advance challenge index if not acknowledged
+    if (triggeredBadgeId === 'goal_getter') {
+      const updatedProgress = {
+        ...progress,
+        badges: updatedBadges,
+        badgeCount: newBadgeCount,
+        earnedBadges: [...progress.earnedBadges, triggeredBadgeId]
+      };
+      saveProgress(updatedProgress);
+      updateBadgeCounterDisplay(newBadgeCount);
+      return triggeredBadgeId;
+    } else if (triggeredBadgeId === 'super_star') {
+      // For Super Star badge, don't update challenge state
       const updatedProgress = {
         ...progress,
         badges: updatedBadges,
@@ -286,7 +299,8 @@ export const resetSpecificBadge = (badgeId: string): boolean => {
     earnedBadges: updatedEarnedBadges,
     currentChallengeIndex: updatedChallengeIndex,
     challengeActive: updatedChallengeActive,
-    challengesCompleted: Math.max(0, progress.challengesCompleted - 1)
+    challengesCompleted: Math.max(0, progress.challengesCompleted - 1),
+    goalGetterAcknowledged: false
   };
 
   saveProgress(updatedProgress);
@@ -310,6 +324,7 @@ export const skipToChallenge = (targetBadgeId: string): void => {
     ...progress,
     currentChallengeIndex: targetIndex,
     challengeActive: false, // Deactivate current challenge so user can start the new one
+    goalGetterAcknowledged: false
   };
 
   saveProgress(updatedProgress);
