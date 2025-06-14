@@ -564,7 +564,7 @@ function App() {
                 </li>
                 <li className="feature-item">
                   <img src="/Palette-icon.png" alt="Draw It Out" className="feature-icon" />
-                  Draw It Out and express your emotions
+                  <span className="nav-button-text max-lg:whitespace-normal max-lg:text-center">Draw It<br />Out</span>
                 </li>
                 <li className="feature-item">
                   <img src="/Trophy-icon.png" alt="Challenges" className="feature-icon" />
