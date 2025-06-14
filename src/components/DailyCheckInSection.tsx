@@ -84,13 +84,19 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
       // Track engagement for Focus Finder
       onEngagement();
 
-      // Update progress for mood_mapper badge
+      // ✅ FIXED: Update progress for mood_mapper badge IMMEDIATELY after submission
       const currentProgress = loadProgress();
+      console.log('🧠 Mood Check-In Count BEFORE:', currentProgress.moodCheckInCount);
+      
       updateProgress({ 
         moodCheckInCount: currentProgress.moodCheckInCount + 1 
       });
+      
+      const updatedProgress = loadProgress();
+      console.log('🧠 Mood Check-In Count AFTER:', updatedProgress.moodCheckInCount);
+      console.log('🟢 Mood Mapper badge earned?', updatedProgress.badges['mood_mapper']);
 
-      // Check for mood_mapper badge
+      // ✅ Check for mood_mapper badge - will be awarded on section exit
       onBadgeEarned('mood_mapper');
 
       // Check for specific mood badges
@@ -102,7 +108,7 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
         if (wordCount >= 15) {
           // Update progress for stay_positive badge
           updateProgress({ 
-            stayPositiveMessageCount: currentProgress.stayPositiveMessageCount + 1,
+            stayPositiveMessageCount: updatedProgress.stayPositiveMessageCount + 1,
             hasLongPositiveMessage: true
           });
           onBadgeEarned('stay_positive');
@@ -123,7 +129,7 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
         if (containsLoveContent && wordCount >= 25) {
           // Update progress with the word count
           updateProgress({ 
-            kindHeartWordCount: Math.max(currentProgress.kindHeartWordCount, wordCount)
+            kindHeartWordCount: Math.max(updatedProgress.kindHeartWordCount, wordCount)
           });
           
           onBadgeEarned('kind_heart'); // Love emoji + 25+ words about love
