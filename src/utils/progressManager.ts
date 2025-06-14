@@ -103,6 +103,14 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     case 'reflecto_rookie':
       conditionMet = progress.chatMessageCount >= 1;
       break;
+    case 'focus_finder':
+      // Focus Finder is handled by engagement tracking in App.tsx
+      conditionMet = true;
+      break;
+    case 'goal_getter':
+      // Goal Getter is handled separately in App.tsx
+      conditionMet = progress.challengesCompleted >= 5;
+      break;
     case 'great_job':
       conditionMet = progress.pdfExportCount >= 1;
       break;

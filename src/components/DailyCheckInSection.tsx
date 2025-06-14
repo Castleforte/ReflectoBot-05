@@ -10,9 +10,10 @@ interface DailyCheckInSectionProps {
   setMoodHistory: React.Dispatch<React.SetStateAction<MoodEntry[]>>;
   onShowMoodHistory: () => void;
   onBadgeEarned: (badgeId: string) => void;
+  onEngagement: () => void;
 }
 
-function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHistory, onShowMoodHistory, onBadgeEarned }: DailyCheckInSectionProps) {
+function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHistory, onShowMoodHistory, onBadgeEarned, onEngagement }: DailyCheckInSectionProps) {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [hoveredMood, setHoveredMood] = useState<string | null>(null);
   const [checkInText, setCheckInText] = useState<string>('');
@@ -46,11 +47,17 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
     if (!hasUserTyped) {
       setCheckInText(sentenceStarters[moodName]);
     }
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCheckInText(e.target.value);
     setHasUserTyped(true);
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleSendCheckIn = () => {
@@ -73,6 +80,9 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
 
       // Add the new entry to mood history
       setMoodHistory(prevHistory => [...prevHistory, newEntry]);
+
+      // Track engagement for Focus Finder
+      onEngagement();
 
       // Check for specific mood badges
       if (selectedMood === 'happy') {

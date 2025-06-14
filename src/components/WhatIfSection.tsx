@@ -6,9 +6,10 @@ interface WhatIfSectionProps {
   onClose: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   onBadgeEarned: (badgeId: string) => void;
+  onEngagement: () => void;
 }
 
-function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned }: WhatIfSectionProps) {
+function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned, onEngagement }: WhatIfSectionProps) {
   const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
   const [isRefreshDisabled, setIsRefreshDisabled] = useState<boolean>(false);
   const [isReading, setIsReading] = useState<boolean>(false);
@@ -27,6 +28,9 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned }: WhatIfSection
     setTimeout(() => {
       setIsRefreshDisabled(false);
     }, 2000);
+
+    // Track engagement for Focus Finder
+    onEngagement();
 
     // Track viewing prompts (separate from answering)
     const currentProgress = loadProgress();
@@ -50,6 +54,9 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned }: WhatIfSection
       // Update robot speech to acknowledge the action
       setRobotSpeech("Listen up! I'm reading your What If prompt out loud. Let your imagination run wild!");
 
+      // Track engagement for Focus Finder
+      onEngagement();
+
       // Track badge progress for using Read It to Me
       onBadgeEarned('boost_buddy');
     }
@@ -69,6 +76,9 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned }: WhatIfSection
     // For now, we'll just show a confirmation in the robot speech
     setRobotSpeech("Wow! I love your creative thinking! That's such an imaginative answer. Want to try another What If question?");
     
+    // Track engagement for Focus Finder
+    onEngagement();
+
     // Track badge progress for answering What If prompts
     onBadgeEarned('what_if_explorer');
     
@@ -81,6 +91,13 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned }: WhatIfSection
       e.preventDefault(); // Prevent default new line behavior
       handleSendResponse();
     }
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setWhatIfText(e.target.value);
+    
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   return (
@@ -121,7 +138,7 @@ function WhatIfSection({ onClose, setRobotSpeech, onBadgeEarned }: WhatIfSection
           <textarea
             className="what-if-textarea"
             value={whatIfText}
-            onChange={(e) => setWhatIfText(e.target.value)}
+            onChange={handleTextChange}
             onKeyDown={handleKeyDown}
             placeholder="Let your imagination run wild! Write your creative answer here..."
           />

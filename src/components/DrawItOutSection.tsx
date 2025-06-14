@@ -5,6 +5,7 @@ interface DrawItOutSectionProps {
   onClose: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   onBadgeEarned: (badgeId: string) => void;
+  onEngagement: () => void;
 }
 
 interface Point {
@@ -31,7 +32,7 @@ const colors = [
 
 const brushSizes = [2, 4, 8]; // Small, Medium, Large
 
-function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutSectionProps) {
+function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onEngagement }: DrawItOutSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState('#ff3333');
@@ -104,6 +105,9 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
     };
     
     setCurrentStroke(newStroke);
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -118,6 +122,9 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
     
     setCurrentStroke(updatedStroke);
     drawStroke(updatedStroke);
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const endDrawing = () => {
@@ -189,6 +196,9 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
 
     // Track that undo was used this session
     setHasUsedUndoThisSession(true);
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleRedo = () => {
@@ -199,6 +209,9 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
     setRedoStack(prev => prev.slice(0, -1));
     setStrokes(nextState);
     redrawCanvas(nextState);
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleSaveDrawing = () => {
@@ -212,6 +225,9 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
 
     // Update robot speech
     setRobotSpeech("Amazing artwork! I love seeing your creativity come to life. Your drawing is ready to save!");
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleDownloadDrawing = () => {
@@ -250,6 +266,9 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
     setCurrentTool('brush');
     // Track colors used in current drawing
     setUsedColors(prev => new Set([...prev, color]));
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleBrushTool = () => {
@@ -261,6 +280,9 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
       setShowBrushSizeSelector(true);
       setShowEraserSizeSelector(false);
     }
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleEraserTool = () => {
@@ -272,12 +294,18 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutS
       setShowEraserSizeSelector(true);
       setShowBrushSizeSelector(false);
     }
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleBrushSizeChange = (size: number) => {
     setCurrentBrushSize(size);
     setShowBrushSizeSelector(false);
     setShowEraserSizeSelector(false);
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleSelectorMouseLeave = () => {

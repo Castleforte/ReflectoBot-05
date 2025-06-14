@@ -10,6 +10,7 @@ interface ChatSectionProps {
   onShowChatHistory: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   onBadgeEarned: (badgeId: string) => void;
+  onEngagement: () => void;
 }
 
 function ChatSection({ 
@@ -18,7 +19,8 @@ function ChatSection({
   setChatMessages, 
   onShowChatHistory, 
   setRobotSpeech, 
-  onBadgeEarned
+  onBadgeEarned,
+  onEngagement
 }: ChatSectionProps) {
   const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
   const [chatInputText, setChatInputText] = useState<string>('');
@@ -57,6 +59,9 @@ function ChatSection({
     setTimeout(() => {
       setIsRefreshDisabled(false);
     }, 2000);
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handlePromptClick = () => {
@@ -67,6 +72,9 @@ function ChatSection({
     if (matchingStarter) {
       setChatInputText(matchingStarter.starter);
     }
+
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   const handleChatHistory = () => {
@@ -116,6 +124,9 @@ function ChatSection({
     
     // Clear input
     setChatInputText('');
+
+    // Track engagement for Focus Finder
+    onEngagement();
 
     // Load current progress and update it
     const currentProgress = loadProgress();
