@@ -179,12 +179,6 @@ export const challengeDetails: Challenge[] = [
     badgeId: 'focus_finder'
   },
   {
-    id: 'goal_getter_challenge',
-    title: 'Goal Getter Challenge',
-    description: 'Show your determination by completing 5 total challenges.\nYou\'re unstoppable when you set your mind to it!',
-    badgeId: 'goal_getter'
-  },
-  {
     id: 'great_job_challenge',
     title: 'Great Job Challenge',
     description: 'Save your progress by downloading your chat or mood history.\nYour journey deserves to be remembered!',
@@ -258,24 +252,23 @@ export const challengeDetails: Challenge[] = [
   }
 ];
 
-// Badge queue in the specified fixed order - now matches the display order
+// Badge queue in the corrected order - goal_getter removed, focus_finder moved to position 5
 export const badgeQueue = [
-  'calm_creator',
-  'mood_mapper',
-  'bounce_back',
-  'reflecto_rookie',
-  'focus_finder',
-  'goal_getter',
-  'great_job',
-  'brave_voice',
-  'what_if_explorer',
-  'truth_spotter',
-  'kind_heart',
-  'boost_buddy',
-  'stay_positive',
-  'good_listener',
-  'creative_spark',
-  'deep_thinker',
-  'resilient',
-  'super_star'
+  'calm_creator',      // Challenge 1
+  'mood_mapper',       // Challenge 2
+  'bounce_back',       // Challenge 3
+  'reflecto_rookie',   // Challenge 4
+  'focus_finder',      // Challenge 5 (moved from position 6)
+  'great_job',         // Challenge 6
+  'brave_voice',       // Challenge 7
+  'what_if_explorer',  // Challenge 8
+  'truth_spotter',     // Challenge 9
+  'kind_heart',        // Challenge 10
+  'boost_buddy',       // Challenge 11
+  'stay_positive',     // Challenge 12
+  'good_listener',     // Challenge 13
+  'creative_spark',    // Challenge 14
+  'deep_thinker',      // Challenge 15
+  'resilient',         // Challenge 16
+  'super_star'         // Challenge 17
 ];
