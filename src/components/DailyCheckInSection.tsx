@@ -10,10 +10,9 @@ interface DailyCheckInSectionProps {
   setMoodHistory: React.Dispatch<React.SetStateAction<MoodEntry[]>>;
   onShowMoodHistory: () => void;
   onBadgeEarned: (badgeId: string) => void;
-  onMeaningfulAction: () => void;
 }
 
-function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHistory, onShowMoodHistory, onBadgeEarned, onMeaningfulAction }: DailyCheckInSectionProps) {
+function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHistory, onShowMoodHistory, onBadgeEarned }: DailyCheckInSectionProps) {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [hoveredMood, setHoveredMood] = useState<string | null>(null);
   const [checkInText, setCheckInText] = useState<string>('');
@@ -47,9 +46,6 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
     if (!hasUserTyped) {
       setCheckInText(sentenceStarters[moodName]);
     }
-
-    // Track meaningful action for Focus Finder
-    onMeaningfulAction();
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -77,9 +73,6 @@ function DailyCheckInSection({ onClose, setRobotSpeech, moodHistory, setMoodHist
 
       // Add the new entry to mood history
       setMoodHistory(prevHistory => [...prevHistory, newEntry]);
-
-      // Track meaningful action for Focus Finder
-      onMeaningfulAction();
 
       // Check for specific mood badges
       if (selectedMood === 'happy') {

@@ -50,10 +50,6 @@ export interface ReflectoBotProgress {
   colorsUsedInDrawing: number;
   challengesCompleted: number;
   readItToMeUsed: number;
-  focusedChallengeCompleted: boolean;
-  focusedChallengeActions: number;
-  focusedChallengeStartTime: number | null;
-  focusedChallengePage: string | null;
   lastVisitDate: string;
   challengeActive: boolean;
   currentChallengeIndex: number;
@@ -61,7 +57,6 @@ export interface ReflectoBotProgress {
   hasLongMessageSent: boolean;
   hasLongPositiveMessage: boolean;
   kindHeartWordCount: number;
-  goalGetterAcknowledged?: boolean;
 }
 
 export interface DrawingEntry {

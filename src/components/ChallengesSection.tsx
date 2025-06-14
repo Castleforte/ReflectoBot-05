@@ -10,9 +10,6 @@ interface ChallengesSectionProps {
   onClose: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   initialSubScreen?: 'next-challenge' | 'my-badges';
-  showGoalGetterCard: boolean;
-  setShowGoalGetterCard: React.Dispatch<React.SetStateAction<boolean>>;
-  onCollectGoalGetterBadge: () => void;
 }
 
 type ChallengeScreen = 'next-challenge' | 'challenge-complete' | 'my-badges';
@@ -20,10 +17,7 @@ type ChallengeScreen = 'next-challenge' | 'challenge-complete' | 'my-badges';
 function ChallengesSection({ 
   onClose, 
   setRobotSpeech, 
-  initialSubScreen = 'next-challenge',
-  showGoalGetterCard,
-  setShowGoalGetterCard,
-  onCollectGoalGetterBadge
+  initialSubScreen = 'next-challenge'
 }: ChallengesSectionProps) {
   const [currentScreen, setCurrentScreen] = useState<ChallengeScreen>(initialSubScreen);
   const [progress, setProgress] = useState<ReflectoBotProgress>(loadProgress());
@@ -36,11 +30,6 @@ function ChallengesSection({
 
   // Get the current challenge based on progress
   const getCurrentChallenge = () => {
-    // Check if Goal Getter badge is earned but not acknowledged - prioritize this
-    if (progress.badges['goal_getter'] && !progress.goalGetterAcknowledged) {
-      return challengeDetails.find(challenge => challenge.badgeId === 'goal_getter');
-    }
-    
     // Get the badge ID from the queue based on current index
     const currentBadgeId = badgeQueue[progress.currentChallengeIndex];
     if (!currentBadgeId) return null; // All challenges completed
@@ -158,27 +147,13 @@ function ChallengesSection({
 
   return (
     <div className="challenges-section">
-      {/* Show Goal Getter card if it should be displayed */}
-      {showGoalGetterCard && (
-        <NextChallengePage
-          challenge={currentChallenge}
-          onStartChallenge={handleStartChallenge}
-          onMyBadges={handleMyBadges}
-          progress={progress}
-          showGoalGetterCard={showGoalGetterCard}
-          onCollectGoalGetterBadge={onCollectGoalGetterBadge}
-        />
-      )}
-      
       {/* Regular next challenge page */}
-      {currentScreen === 'next-challenge' && !showGoalGetterCard && (
+      {currentScreen === 'next-challenge' && (
         <NextChallengePage
           challenge={currentChallenge}
           onStartChallenge={handleStartChallenge}
           onMyBadges={handleMyBadges}
           progress={progress}
-          showGoalGetterCard={false}
-          onCollectGoalGetterBadge={onCollectGoalGetterBadge}
         />
       )}
       

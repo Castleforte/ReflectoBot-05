@@ -5,7 +5,6 @@ interface DrawItOutSectionProps {
   onClose: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   onBadgeEarned: (badgeId: string) => void;
-  onMeaningfulAction: () => void;
 }
 
 interface Point {
@@ -32,7 +31,7 @@ const colors = [
 
 const brushSizes = [2, 4, 8]; // Small, Medium, Large
 
-function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningfulAction }: DrawItOutSectionProps) {
+function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned }: DrawItOutSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState('#ff3333');
@@ -105,9 +104,6 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningful
     };
     
     setCurrentStroke(newStroke);
-
-    // Track meaningful action for Focus Finder
-    onMeaningfulAction();
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -193,9 +189,6 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningful
 
     // Track that undo was used this session
     setHasUsedUndoThisSession(true);
-
-    // Track meaningful action for Focus Finder
-    onMeaningfulAction();
   };
 
   const handleRedo = () => {
@@ -206,9 +199,6 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningful
     setRedoStack(prev => prev.slice(0, -1));
     setStrokes(nextState);
     redrawCanvas(nextState);
-
-    // Track meaningful action for Focus Finder
-    onMeaningfulAction();
   };
 
   const handleSaveDrawing = () => {
@@ -222,9 +212,6 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onMeaningful
 
     // Update robot speech
     setRobotSpeech("Amazing artwork! I love seeing your creativity come to life. Your drawing is ready to save!");
-
-    // Track meaningful action for Focus Finder
-    onMeaningfulAction();
   };
 
   const handleDownloadDrawing = () => {

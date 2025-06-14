@@ -21,15 +21,13 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     colorsUsedInDrawing: 0,
     challengesCompleted: 0,
     readItToMeUsed: 0,
-    focusedChallengeCompleted: false,
     lastVisitDate: today,
     challengeActive: false,
     currentChallengeIndex: 0,
     stayPositiveMessageCount: 0,
     hasLongMessageSent: false,
     hasLongPositiveMessage: false,
-    kindHeartWordCount: 0,
-    goalGetterAcknowledged: false
+    kindHeartWordCount: 0
   };
 };
 
@@ -50,8 +48,7 @@ export const loadProgress = (): ReflectoBotProgress => {
         hasLongMessageSent: parsed.hasLongMessageSent ?? false,
         hasLongPositiveMessage: parsed.hasLongPositiveMessage ?? false,
         whatIfPromptsAnswered: parsed.whatIfPromptsAnswered ?? 0,
-        kindHeartWordCount: parsed.kindHeartWordCount ?? 0,
-        goalGetterAcknowledged: parsed.goalGetterAcknowledged ?? false
+        kindHeartWordCount: parsed.kindHeartWordCount ?? 0
       };
     }
   } catch (error) {
@@ -77,16 +74,16 @@ export const updateProgress = (updates: Partial<ReflectoBotProgress>): ReflectoB
 
 // New badge checking system with gatekeeping rules
 export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: ReflectoBotProgress): string | null => {
-  // Only award badges if challenge is active (except for cumulative badges)
-  if (!progress.challengeActive && triggeredBadgeId !== 'goal_getter' && triggeredBadgeId !== 'super_star') {
+  // Only award badges if challenge is active
+  if (!progress.challengeActive) {
     return null;
   }
 
   // Get the expected badge based on current challenge index
   const expectedBadgeId = badgeQueue[progress.currentChallengeIndex];
   
-  // Only award if the triggered badge matches the expected badge (except for cumulative badges)
-  if (triggeredBadgeId !== expectedBadgeId && triggeredBadgeId !== 'goal_getter' && triggeredBadgeId !== 'super_star') {
+  // Only award if the triggered badge matches the expected badge
+  if (triggeredBadgeId !== expectedBadgeId) {
     return null;
   }
 
@@ -105,12 +102,6 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
       break;
     case 'reflecto_rookie':
       conditionMet = progress.chatMessageCount >= 1;
-      break;
-    case 'focus_finder':
-      conditionMet = progress.focusedChallengeCompleted;
-      break;
-    case 'goal_getter':
-      conditionMet = progress.challengesCompleted >= 5;
       break;
     case 'great_job':
       conditionMet = progress.pdfExportCount >= 1;
@@ -147,9 +138,6 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     case 'resilient':
       conditionMet = progress.returnDays.length >= 3;
       break;
-    case 'super_star':
-      conditionMet = progress.badgeCount >= 17;
-      break;
     default:
       return null;
   }
@@ -160,43 +148,19 @@ export const checkAndUpdateBadges = (triggeredBadgeId: string, progress: Reflect
     const updatedBadges = { ...progress.badges, [triggeredBadgeId]: true };
     const newBadgeCount = progress.badgeCount + 1;
     
-    // For Goal Getter badge, don't advance challenge index if not acknowledged
-    if (triggeredBadgeId === 'goal_getter') {
-      const updatedProgress = {
-        ...progress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...progress.earnedBadges, triggeredBadgeId]
-      };
-      saveProgress(updatedProgress);
-      updateBadgeCounterDisplay(newBadgeCount);
-      return triggeredBadgeId;
-    } else if (triggeredBadgeId === 'super_star') {
-      // For Super Star badge, don't update challenge state
-      const updatedProgress = {
-        ...progress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...progress.earnedBadges, triggeredBadgeId]
-      };
-      saveProgress(updatedProgress);
-      updateBadgeCounterDisplay(newBadgeCount);
-      return triggeredBadgeId;
-    } else {
-      // For all other badges, update challenge state immediately
-      const updatedProgress = {
-        ...progress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...progress.earnedBadges, triggeredBadgeId],
-        challengeActive: false,
-        currentChallengeIndex: Math.min(progress.currentChallengeIndex + 1, badgeQueue.length - 1),
-        challengesCompleted: progress.challengesCompleted + 1
-      };
-      saveProgress(updatedProgress);
-      updateBadgeCounterDisplay(newBadgeCount);
-      return triggeredBadgeId;
-    }
+    // Update challenge state immediately
+    const updatedProgress = {
+      ...progress,
+      badges: updatedBadges,
+      badgeCount: newBadgeCount,
+      earnedBadges: [...progress.earnedBadges, triggeredBadgeId],
+      challengeActive: false,
+      currentChallengeIndex: Math.min(progress.currentChallengeIndex + 1, badgeQueue.length - 1),
+      challengesCompleted: progress.challengesCompleted + 1
+    };
+    saveProgress(updatedProgress);
+    updateBadgeCounterDisplay(newBadgeCount);
+    return triggeredBadgeId;
   }
 
   return null;
@@ -299,8 +263,7 @@ export const resetSpecificBadge = (badgeId: string): boolean => {
     earnedBadges: updatedEarnedBadges,
     currentChallengeIndex: updatedChallengeIndex,
     challengeActive: updatedChallengeActive,
-    challengesCompleted: Math.max(0, progress.challengesCompleted - 1),
-    goalGetterAcknowledged: false
+    challengesCompleted: Math.max(0, progress.challengesCompleted - 1)
   };
 
   saveProgress(updatedProgress);
@@ -323,8 +286,7 @@ export const skipToChallenge = (targetBadgeId: string): void => {
   const updatedProgress = {
     ...progress,
     currentChallengeIndex: targetIndex,
-    challengeActive: false, // Deactivate current challenge so user can start the new one
-    goalGetterAcknowledged: false
+    challengeActive: false // Deactivate current challenge so user can start the new one
   };
 
   saveProgress(updatedProgress);

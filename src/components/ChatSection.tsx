@@ -10,7 +10,6 @@ interface ChatSectionProps {
   onShowChatHistory: () => void;
   setRobotSpeech: React.Dispatch<React.SetStateAction<string>>;
   onBadgeEarned: (badgeId: string) => void;
-  onMeaningfulAction: () => void;
 }
 
 function ChatSection({ 
@@ -19,8 +18,7 @@ function ChatSection({
   setChatMessages, 
   onShowChatHistory, 
   setRobotSpeech, 
-  onBadgeEarned, 
-  onMeaningfulAction
+  onBadgeEarned
 }: ChatSectionProps) {
   const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
   const [chatInputText, setChatInputText] = useState<string>('');
@@ -59,9 +57,6 @@ function ChatSection({
     setTimeout(() => {
       setIsRefreshDisabled(false);
     }, 2000);
-
-    // Track meaningful action for Focus Finder
-    onMeaningfulAction();
   };
 
   const handlePromptClick = () => {
@@ -121,9 +116,6 @@ function ChatSection({
     
     // Clear input
     setChatInputText('');
-
-    // Track meaningful action for Focus Finder
-    onMeaningfulAction();
 
     // Load current progress and update it
     const currentProgress = loadProgress();
