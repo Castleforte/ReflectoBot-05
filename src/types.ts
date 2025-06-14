@@ -61,7 +61,6 @@ export interface ReflectoBotProgress {
   hasLongMessageSent: boolean;
   hasLongPositiveMessage: boolean;
   kindHeartWordCount: number;
-  goalGetterAcknowledged?: boolean;
 }
 
 export interface DrawingEntry {
