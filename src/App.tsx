@@ -45,6 +45,32 @@ function App() {
     handleBadgeEarned('resilient');
   }, []);
 
+  // Check for Super Star badge
+  const checkSuperStarBadge = () => {
+    const currentProgress = loadProgress();
+    
+    // Check if user has earned 17 other badges (all except super_star)
+    if (currentProgress.badgeCount >= 17 && !currentProgress.badges['super_star']) {
+      // Award Super Star badge
+      const updatedBadges = { ...currentProgress.badges, super_star: true };
+      const newBadgeCount = currentProgress.badgeCount + 1;
+      
+      const updatedProgress = {
+        ...currentProgress,
+        badges: updatedBadges,
+        badgeCount: newBadgeCount,
+        earnedBadges: [...currentProgress.earnedBadges, 'super_star']
+      };
+      
+      updateProgress(updatedProgress);
+      setProgress(updatedProgress);
+      
+      // Set as pending to show after current badge screen
+      setPendingAwardedBadge('super_star');
+      setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
+    }
+  };
+
   // Helper function to display pending badge completion page
   const handlePendingBadgeDisplay = () => {
     if (!pendingAwardedBadge) return false;
@@ -57,6 +83,8 @@ function App() {
     // Customize robot speech based on badge type
     if (badgeToAward === 'reflecto_rookie') {
       setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
+    } else if (badgeToAward === 'super_star') {
+      setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
     } else {
       setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
     }
@@ -101,6 +129,11 @@ const handleBadgeEarned = (badgeId: string) => {
       setCurrentScreen('challenge-complete');
       setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
       setProgress(loadProgress()); // Refresh progress state
+      
+      // Check for Super Star badge after awarding any badge
+      setTimeout(() => {
+        checkSuperStarBadge();
+      }, 100);
     }
   };
 
@@ -167,6 +200,11 @@ const handleBadgeEarned = (badgeId: string) => {
       // Show Goal Getter page
       setCurrentScreen('goal-getter');
       setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
+      
+      // Check for Super Star badge after awarding Goal Getter
+      setTimeout(() => {
+        checkSuperStarBadge();
+      }, 100);
     }
   };
 
@@ -263,6 +301,11 @@ const handleBadgeEarned = (badgeId: string) => {
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
     setRobotSpeech(`Amazing! You've earned the Goal Getter badge! You now have ${progress.badgeCount} badges total. Keep going for more!`);
+    
+    // Check for Super Star badge after collecting Goal Getter
+    setTimeout(() => {
+      checkSuperStarBadge();
+    }, 100);
   };
 
   const handleSectionClose = (sectionName: string) => {
