@@ -51,6 +51,7 @@ function App() {
     // Check for Goal Getter badge (complete 5 challenges)
     if (currentProgress.challengesCompleted >= 5 && !currentProgress.badges['goal_getter']) {
       handleBadgeEarned('goal_getter');
+      setShowGoalGetterCard(true);
       return; // Exit early to avoid checking Super Star in the same cycle
     }
     
@@ -85,7 +86,9 @@ function App() {
     const updatedProgress = {
       ...currentProgress,
       challengeActive: false,
-      currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1)
+      currentChallengeIndex: (badgeToAward === 'goal_getter' || badgeToAward === 'super_star')
+  ? currentProgress.currentChallengeIndex
+  : Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1)
     };
     updateProgress(updatedProgress);
     setProgress(updatedProgress); // Update local state
