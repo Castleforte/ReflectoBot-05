@@ -148,6 +148,18 @@ function ChatSection({
       console.log('✅ Long message detected (15+ words)');
     }
 
+    // ✅ FIXED: Check for "because" keyword for Brave Voice badge
+    if (trimmedMessage.toLowerCase().includes('because')) {
+      console.log('✅ "Because" keyword detected - setting brave voice flag');
+      progressUpdates.hasBraveVoiceMessage = true;
+    }
+    
+    // ✅ FIXED: Check for "I realized" keyword for Truth Spotter badge
+    if (trimmedMessage.toLowerCase().includes('i realized')) {
+      console.log('✅ "I realized" phrase detected - setting truth spotter flag');
+      progressUpdates.hasTruthSpotterMessage = true;
+    }
+
     // Check for positive message and Stay Positive challenge
     if (isPositiveMessage(trimmedMessage)) {
       // Check if Stay Positive challenge is active

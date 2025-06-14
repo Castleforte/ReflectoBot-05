@@ -43,7 +43,11 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     lastVisitDate: today,
     
     // Pending badges
-    pendingBadges: []
+    pendingBadges: [],
+    
+    // Content-based badge flags
+    hasBraveVoiceMessage: false,
+    hasTruthSpotterMessage: false
   };
 };
 
@@ -61,7 +65,9 @@ export const loadProgress = (): ReflectoBotProgress => {
         focusPage: parsed.focusPage ?? null,
         focusEngagementCount: parsed.focusEngagementCount ?? 0,
         visitedSections: parsed.visitedSections ?? [],
-        pendingBadges: parsed.pendingBadges ?? []
+        pendingBadges: parsed.pendingBadges ?? [],
+        hasBraveVoiceMessage: parsed.hasBraveVoiceMessage ?? false,
+        hasTruthSpotterMessage: parsed.hasTruthSpotterMessage ?? false
       };
     }
   } catch (error) {
@@ -106,7 +112,9 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     historyViews: progress.historyViews,
     colorsUsedInDrawing: progress.colorsUsedInDrawing,
     hasLongMessageSent: progress.hasLongMessageSent,
-    visitedSections: progress.visitedSections
+    visitedSections: progress.visitedSections,
+    hasBraveVoiceMessage: progress.hasBraveVoiceMessage,
+    hasTruthSpotterMessage: progress.hasTruthSpotterMessage
   });
 
   switch (badgeId) {
@@ -124,13 +132,13 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     case 'great_job':
       return progress.pdfExportCount >= 1;
     case 'brave_voice':
-      // This is checked by message content analysis
-      return false;
+      // ✅ FIXED: Check for brave voice message flag
+      return progress.hasBraveVoiceMessage;
     case 'what_if_explorer':
       return progress.whatIfPromptsAnswered >= 3;
     case 'truth_spotter':
-      // This is checked by message content analysis
-      return false;
+      // ✅ FIXED: Check for truth spotter message flag
+      return progress.hasTruthSpotterMessage;
     case 'kind_heart':
       return progress.kindHeartWordCount >= 25;
     case 'boost_buddy':

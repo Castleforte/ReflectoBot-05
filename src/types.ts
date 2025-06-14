@@ -73,6 +73,10 @@ export interface ReflectoBotProgress {
   
   // Pending badges (for exit-based awards)
   pendingBadges: string[];
+  
+  // Content-based badge flags
+  hasBraveVoiceMessage: boolean;
+  hasTruthSpotterMessage: boolean;
 }
 
 export interface DrawingEntry {
