@@ -179,9 +179,10 @@ function App() {
     const badgeAwarded = handleSectionExit(currentScreen);
     if (badgeAwarded) {
       console.log('🛑 Badge awarded - stopping logo navigation');
-      return;
+      return; // ✅ CRITICAL: STOP HERE IF BADGE WAS AWARDED
     }
     
+    // ✅ ONLY CONTINUE IF NO BADGE WAS AWARDED
     if (currentScreen === 'settings') {
       setCurrentScreen('welcome');
       setRobotSpeech("Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!");
@@ -196,9 +197,10 @@ function App() {
     const badgeAwarded = handleSectionExit(currentScreen);
     if (badgeAwarded) {
       console.log('🛑 Badge awarded - stopping navigation');
-      return;
+      return; // ✅ CRITICAL: STOP HERE IF BADGE WAS AWARDED
     }
     
+    // ✅ ONLY CONTINUE IF NO BADGE WAS AWARDED
     setCurrentScreen(screen);
     handleSectionEnter(screen);
     
@@ -263,9 +265,10 @@ function App() {
     const badgeAwarded = handleSectionExit(sectionName);
     if (badgeAwarded) {
       console.log('🛑 Badge awarded - stopping section close navigation');
-      return;
+      return; // ✅ CRITICAL: STOP HERE IF BADGE WAS AWARDED
     }
     
+    // ✅ ONLY CONTINUE IF NO BADGE WAS AWARDED
     setCurrentScreen('welcome');
     setRobotSpeech("Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!");
   };
