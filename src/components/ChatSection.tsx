@@ -132,6 +132,11 @@ function ChatSection({
     const currentProgress = loadProgress();
     const wordCount = trimmedMessage.split(/\s+/).filter(word => word.length > 0).length;
     
+    console.log(`💬 Chat message sent: "${trimmedMessage}"`);
+    console.log(`📊 Word count: ${wordCount}`);
+    console.log(`🔍 Contains "because": ${trimmedMessage.toLowerCase().includes('because')}`);
+    console.log(`🔍 Contains "I realized": ${trimmedMessage.toLowerCase().includes('i realized')}`);
+    
     // Prepare progress updates
     let progressUpdates: any = {
       chatMessageCount: currentProgress.chatMessageCount + 1
@@ -140,6 +145,7 @@ function ChatSection({
     // Check for long message (15+ words)
     if (wordCount >= 15) {
       progressUpdates.hasLongMessageSent = true;
+      console.log('✅ Long message detected (15+ words)');
     }
 
     // Check for positive message and Stay Positive challenge
@@ -151,6 +157,7 @@ function ChatSection({
         // If this is a long positive message (15+ words), mark it
         if (wordCount >= 15) {
           progressUpdates.hasLongPositiveMessage = true;
+          console.log('✅ Long positive message detected');
         }
       }
     }
@@ -163,19 +170,24 @@ function ChatSection({
     
     // Check for specific badge conditions
     if (wordCount >= 15) {
+      console.log('🏆 Triggering deep_thinker badge (15+ words)');
       onBadgeEarned('deep_thinker'); // 15+ words badge
     }
     
+    // ✅ FIXED: Check for "because" keyword for Brave Voice badge
     if (trimmedMessage.toLowerCase().includes('because')) {
+      console.log('🏆 Triggering brave_voice badge (contains "because")');
       onBadgeEarned('brave_voice'); // Contains "because" badge
     }
     
     if (trimmedMessage.toLowerCase().includes('i realized')) {
+      console.log('🏆 Triggering truth_spotter badge (contains "I realized")');
       onBadgeEarned('truth_spotter'); // Contains "I realized" badge
     }
 
     // Check for Stay Positive badge
     if (isPositiveMessage(trimmedMessage) && currentProgress.challengeActive && currentProgress.currentChallengeIndex === 11) {
+      console.log('🏆 Triggering stay_positive badge (positive message)');
       onBadgeEarned('stay_positive');
     }
     
