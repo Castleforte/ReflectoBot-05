@@ -250,25 +250,24 @@ function App() {
       
       // ✅ RECOMMENDED FIX: Add setTimeout to yield one tick and ensure Focus Finder progress is flushed
       setTimeout(() => {
-        console.log('🎯 Checking Goal Getter after setTimeout...');
+        const progress = loadProgress();
+        console.log('✅ Progress BEFORE Goal Getter check:', progress);
+
         const goalGetterAwarded = checkGoalGetterBadge();
         if (goalGetterAwarded) {
-          console.log('🎯 Goal Getter conditions met - showing Goal Getter screen');
-          setPendingGoalGetter(false);
           setNewlyEarnedBadge(null);
           setCurrentScreen('goal-getter');
           setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
-        } else {
-          console.log('❌ Goal Getter conditions NOT met - proceeding to normal flow');
-          setPendingGoalGetter(false);
-          // Continue to normal next challenge flow
-          setCurrentScreen('challenges');
-          setChallengesSubScreen('next-challenge');
-          setNewlyEarnedBadge(null);
-          setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
+          return;
         }
-      }, 0);
+
+        // fallback navigation
+        setCurrentScreen('challenges');
+        setChallengesSubScreen('next-challenge');
+        setNewlyEarnedBadge(null);
+      }, 50); // micro delay ensures progress state is up to date
       
+      setPendingGoalGetter(false);
       return; // Exit early while setTimeout handles the logic
     }
     
@@ -298,25 +297,24 @@ function App() {
       
       // ✅ RECOMMENDED FIX: Add setTimeout to yield one tick and ensure Focus Finder progress is flushed
       setTimeout(() => {
-        console.log('🎯 Checking Goal Getter after setTimeout...');
+        const progress = loadProgress();
+        console.log('✅ Progress BEFORE Goal Getter check:', progress);
+
         const goalGetterAwarded = checkGoalGetterBadge();
         if (goalGetterAwarded) {
-          console.log('🎯 Goal Getter conditions met - showing Goal Getter screen');
-          setPendingGoalGetter(false);
           setNewlyEarnedBadge(null);
           setCurrentScreen('goal-getter');
           setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
-        } else {
-          console.log('❌ Goal Getter conditions NOT met - proceeding to normal flow');
-          setPendingGoalGetter(false);
-          // Continue to normal my badges flow
-          setCurrentScreen('challenges');
-          setChallengesSubScreen('my-badges');
-          setNewlyEarnedBadge(null);
-          setRobotSpeech(`Wow! You've already earned ${progress.badgeCount} badges! Just ${18 - progress.badgeCount} more to unlock the full set. Keep going!`);
+          return;
         }
-      }, 0);
+
+        // fallback navigation
+        setCurrentScreen('challenges');
+        setChallengesSubScreen('my-badges');
+        setNewlyEarnedBadge(null);
+      }, 50); // micro delay ensures progress state is up to date
       
+      setPendingGoalGetter(false);
       return; // Exit early while setTimeout handles the logic
     }
     
