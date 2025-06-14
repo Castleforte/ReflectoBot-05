@@ -22,7 +22,8 @@ import {
   trackFocusEngagement,
   checkFocusFinderCompletion,
   trackSectionVisit,
-  saveProgress
+  saveProgress,
+  checkGoalGetterBadge
 } from './utils/progressManager';
 import { badgeQueue } from './badgeData';
 
@@ -118,13 +119,10 @@ function App() {
       if (badgeToAward === 'focus_finder') {
         console.log('🎯 Focus Finder awarded - checking for Goal Getter eligibility NOW');
         
-        // Get the UPDATED progress after Focus Finder was awarded
-        const updatedProgress = loadProgress();
-        console.log(`🎯 Updated challengesCompleted: ${updatedProgress.challengesCompleted}`);
-        
-        // Check if we now have 5 completed challenges and no Goal Getter badge yet
-        if (updatedProgress.challengesCompleted >= 5 && !updatedProgress.badges['goal_getter']) {
-          console.log('🎯 Goal Getter condition met - setting pending flag');
+        // Call the progress manager to check and award Goal Getter if conditions are met
+        const goalGetterAwarded = checkGoalGetterBadge();
+        if (goalGetterAwarded) {
+          console.log('🎯 Goal Getter badge awarded by progress manager - setting pending flag');
           setPendingGoalGetter(true);
         }
       }
@@ -243,28 +241,13 @@ function App() {
     }
   };
 
-  // 🎯 CRITICAL FIX: Handle Next Challenge button with IMMEDIATE Goal Getter check
+  // 🎯 FIXED: Handle Next Challenge button - removed manual Goal Getter awarding
   const handleNextChallengeFromApp = () => {
-    console.log('🎯 Next Challenge clicked - checking for immediate Goal Getter');
+    console.log('🎯 Next Challenge clicked - checking for pending Goal Getter');
     
     // Check for pending Goal Getter FIRST
     if (pendingGoalGetter) {
-      console.log('🎯 Pending Goal Getter detected - awarding badge and showing screen');
-      
-      // Award Goal Getter badge immediately
-      const currentProgress = loadProgress();
-      const updatedBadges = { ...currentProgress.badges, goal_getter: true };
-      const newBadgeCount = currentProgress.badgeCount + 1;
-      
-      const updatedProgress = {
-        ...currentProgress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...currentProgress.earnedBadges, 'goal_getter']
-      };
-      
-      saveProgress(updatedProgress);
-      setProgress(updatedProgress);
+      console.log('🎯 Pending Goal Getter detected - showing Goal Getter screen');
       
       // Clear pending flag and show Goal Getter screen
       setPendingGoalGetter(false);
@@ -290,28 +273,13 @@ function App() {
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
   };
 
-  // 🎯 CRITICAL FIX: Handle My Badges button with IMMEDIATE Goal Getter check
+  // 🎯 FIXED: Handle My Badges button - removed manual Goal Getter awarding
   const handleMyBadgesFromApp = () => {
-    console.log('🎯 My Badges clicked - checking for immediate Goal Getter');
+    console.log('🎯 My Badges clicked - checking for pending Goal Getter');
     
     // Check for pending Goal Getter FIRST
     if (pendingGoalGetter) {
-      console.log('🎯 Pending Goal Getter detected - awarding badge and showing screen');
-      
-      // Award Goal Getter badge immediately
-      const currentProgress = loadProgress();
-      const updatedBadges = { ...currentProgress.badges, goal_getter: true };
-      const newBadgeCount = currentProgress.badgeCount + 1;
-      
-      const updatedProgress = {
-        ...currentProgress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...currentProgress.earnedBadges, 'goal_getter']
-      };
-      
-      saveProgress(updatedProgress);
-      setProgress(updatedProgress);
+      console.log('🎯 Pending Goal Getter detected - showing Goal Getter screen');
       
       // Clear pending flag and show Goal Getter screen
       setPendingGoalGetter(false);
@@ -564,7 +532,7 @@ function App() {
                 </li>
                 <li className="feature-item">
                   <img src="/Palette-icon.png" alt="Draw It Out" className="feature-icon" />
-                  <span className="nav-button-text max-lg:whitespace-normal max-lg:text-center">Draw It<br />Out</span>
+                  Draw It Out and express your emotions
                 </li>
                 <li className="feature-item">
                   <img src="/Trophy-icon.png" alt="Challenges" className="feature-icon" />
