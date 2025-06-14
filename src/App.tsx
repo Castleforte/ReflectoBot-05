@@ -12,11 +12,24 @@ import GrownUpAccessModal from './components/GrownUpAccessModal';
 import ChatHistoryModal from './components/ChatHistoryModal';
 import MoodHistoryModal from './components/MoodHistoryModal';
 import { ConversationTurn, MoodEntry, ReflectoBotProgress } from './types';
-import { loadProgress, trackDailyVisit, updateProgress, checkAndUpdateBadges } from './utils/progressManager';
-import { badgeQueue } from './badgeData';
+import { 
+  loadProgress, 
+  trackDailyVisit, 
+  updateProgress, 
+  awardBadge,
+  checkBadgeCondition,
+  addPendingBadge,
+  getPendingBadges,
+  startFocusTracking,
+  trackFocusEngagement,
+  checkFocusFinderCompletion,
+  trackSectionVisit,
+  checkGoalGetterBadge,
+  checkSuperStarBadge
+} from './utils/progressManager';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges' | 'challenge-complete' | 'goal-getter'>('welcome');
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges' | 'challenge-complete' | 'goal-getter' | 'super-star'>('welcome');
   const [challengesSubScreen, setChallengesSubScreen] = useState<'next-challenge' | 'my-badges'>('next-challenge');
   const [showGrownUpModal, setShowGrownUpModal] = useState(false);
   const [showChatHistoryModal, setShowChatHistoryModal] = useState(false);
@@ -25,197 +38,106 @@ function App() {
   const [moodHistory, setMoodHistory] = useState<MoodEntry[]>([]);
   const [progress, setProgress] = useState<ReflectoBotProgress>(loadProgress());
   const [newlyEarnedBadge, setNewlyEarnedBadge] = useState<string | null>(null);
-  const [pendingAwardedBadge, setPendingAwardedBadge] = useState<string | null>(null);
   const [robotSpeech, setRobotSpeech] = useState<string>(
     "Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!"
   );
-
-  // Focus Finder tracking state
-  const [focusStartTime, setFocusStartTime] = useState<number | null>(null);
-  const [focusPage, setFocusPage] = useState<string | null>(null);
-  const [focusEngagementTime, setFocusEngagementTime] = useState<number>(0);
-  const [lastEngagementTime, setLastEngagementTime] = useState<number | null>(null);
 
   // Track daily visit on component mount
   useEffect(() => {
     const updatedProgress = trackDailyVisit();
     setProgress(updatedProgress);
-    
-    // Check for resilient badge after tracking daily visit
-    handleBadgeEarned('resilient');
   }, []);
 
-  // Check for Super Star badge
-  const checkSuperStarBadge = () => {
+  // Handle section navigation and tracking
+  const handleSectionEnter = (section: string) => {
+    // Track section visit for resilient badge
+    trackSectionVisit(section);
+    
+    // Start focus tracking if applicable
+    startFocusTracking(section);
+    
+    // Update progress state
+    setProgress(loadProgress());
+  };
+
+  // Handle section exit and check for pending badges
+  const handleSectionExit = (fromSection: string) => {
     const currentProgress = loadProgress();
     
-    // Check if user has earned 17 other badges (all except super_star)
-    if (currentProgress.badgeCount >= 17 && !currentProgress.badges['super_star']) {
-      // Award Super Star badge
-      const updatedBadges = { ...currentProgress.badges, super_star: true };
-      const newBadgeCount = currentProgress.badgeCount + 1;
-      
-      const updatedProgress = {
-        ...currentProgress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...currentProgress.earnedBadges, 'super_star']
-      };
-      
-      updateProgress(updatedProgress);
+    // Check Focus Finder completion if leaving a tracked page
+    if (currentProgress.focusPage === fromSection && checkFocusFinderCompletion()) {
+      addPendingBadge('focus_finder');
+    }
+    
+    // Check for other badge conditions based on current challenge
+    const currentBadgeId = currentProgress.challengeActive ? 
+      ['calm_creator', 'mood_mapper', 'bounce_back', 'reflecto_rookie', 'focus_finder', 'great_job', 'brave_voice', 'what_if_explorer', 'truth_spotter', 'kind_heart', 'boost_buddy', 'stay_positive', 'good_listener', 'creative_spark', 'deep_thinker', 'resilient'][currentProgress.currentChallengeIndex] : 
+      null;
+    
+    if (currentBadgeId && checkBadgeCondition(currentBadgeId, currentProgress)) {
+      addPendingBadge(currentBadgeId);
+    }
+    
+    // Check resilient badge
+    if (currentProgress.visitedSections.length >= 4 && currentProgress.challengeActive && currentBadgeId === 'resilient') {
+      addPendingBadge('resilient');
+    }
+    
+    // Process any pending badges
+    const pendingBadges = getPendingBadges();
+    if (pendingBadges.length > 0) {
+      // Award the first pending badge
+      const badgeToAward = pendingBadges[0];
+      const updatedProgress = awardBadge(badgeToAward);
       setProgress(updatedProgress);
-      
-      // Set as pending to show after current badge screen
-      setPendingAwardedBadge('super_star');
-      setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
-    }
-  };
-
-  // Helper function to display pending badge completion page
-  const handlePendingBadgeDisplay = () => {
-    if (!pendingAwardedBadge) return false;
-
-    const badgeToAward = pendingAwardedBadge;
-    setNewlyEarnedBadge(badgeToAward);
-    console.log('Challenge complete screen should show now');
-    setCurrentScreen('challenge-complete');
-    
-    // Customize robot speech based on badge type
-    if (badgeToAward === 'reflecto_rookie') {
-      setRobotSpeech("Congratulations on your first message! You're now a Reflecto Rookie - welcome to the journey!");
-    } else if (badgeToAward === 'super_star') {
-      setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
-    } else {
-      setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
-    }
-    
-    // Update persistent progress for the pending badge (deactivate challenge, increment index)
-    const currentProgress = loadProgress();
-    const updatedProgress = {
-      ...currentProgress,
-      challengeActive: false,
-      currentChallengeIndex: Math.min(currentProgress.currentChallengeIndex + 1, badgeQueue.length - 1)
-    };
-    updateProgress(updatedProgress);
-    setProgress(updatedProgress); // Update local state
-    
-    // Reset pending badge
-    setPendingAwardedBadge(null);
-
-    return true; // Indicate that a pending badge was handled
-  };
-
-  // UPDATED BADGE LOGIC
-const handleBadgeEarned = (badgeId: string) => {
-    const currentProgress = loadProgress();
-    
-    // Check if badge should be awarded
-    const awardedBadgeId = checkAndUpdateBadges(badgeId, currentProgress);
-    
-    if (awardedBadgeId) {
-      // Special handling for Reflecto Rookie - make it pending to avoid interrupting chat
-      if (awardedBadgeId === 'reflecto_rookie') {
-        setPendingAwardedBadge(awardedBadgeId);
-        setRobotSpeech("Great job sending your first message! I'll show you your badge when you're done chatting.");
-        setProgress(loadProgress()); // Refresh progress state
-        return; // Exit early - badge will be shown when user navigates away
-      }
-      
-      // For all other badges, immediately show the complete page
-      console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
-      setNewlyEarnedBadge(awardedBadgeId);
-      console.log('Challenge complete screen should show now');
-      console.log("Attempting to set screen to 'challenge-complete' for badge:", awardedBadgeId);
+      setNewlyEarnedBadge(badgeToAward);
       setCurrentScreen('challenge-complete');
       setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
-      setProgress(loadProgress()); // Refresh progress state
       
-      // Check for Super Star badge after awarding any badge
-      setTimeout(() => {
-        checkSuperStarBadge();
-      }, 100);
-    }
-  };
-
-  // Focus Finder engagement tracking
-  const handleEngagement = () => {
-    const now = Date.now();
-    setLastEngagementTime(now);
-    
-    // If this is the first engagement on this page, start tracking
-    if (!focusStartTime && (currentScreen === 'chat' || currentScreen === 'daily-checkin' || currentScreen === 'what-if' || currentScreen === 'draw-it-out')) {
-      setFocusStartTime(now);
-      setFocusPage(currentScreen);
-      setFocusEngagementTime(0);
-    }
-  };
-
-  // Check Focus Finder conditions when leaving a page
-  const checkFocusFinderOnLeave = () => {
-    const currentProgress = loadProgress();
-    
-    // Only check if Focus Finder challenge is active and we're tracking this page
-    if (currentProgress.challengeActive && 
-        currentProgress.currentChallengeIndex === 4 && // focus_finder is at index 4
-        focusStartTime && 
-        focusPage === currentScreen &&
-        lastEngagementTime) {
-      
-      // Calculate total engagement time
-      const totalTime = lastEngagementTime - focusStartTime;
-      
-      if (totalTime >= 90000) { // 90 seconds
-        // Award Focus Finder badge
-        handleBadgeEarned('focus_finder');
+      // Check for Goal Getter after awarding Focus Finder
+      if (badgeToAward === 'focus_finder') {
+        setTimeout(() => {
+          if (checkGoalGetterBadge()) {
+            setCurrentScreen('goal-getter');
+            setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
+          }
+        }, 100);
       }
+      
+      // Check for Super Star after any badge
+      setTimeout(() => {
+        if (checkSuperStarBadge()) {
+          setCurrentScreen('super-star');
+          setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
+        }
+      }, 200);
     }
-    
-    // Reset tracking
-    setFocusStartTime(null);
-    setFocusPage(null);
-    setFocusEngagementTime(0);
-    setLastEngagementTime(null);
   };
 
-  // Check for Goal Getter after Focus Finder is awarded
-  const checkGoalGetter = () => {
+  // Handle engagement tracking
+  const handleEngagement = () => {
+    trackFocusEngagement();
+  };
+
+  // Handle immediate badge triggers (for content-based badges)
+  const handleBadgeEarned = (badgeId: string) => {
     const currentProgress = loadProgress();
     
-    // Check if we just completed the 5th challenge (Focus Finder)
-    if (currentProgress.challengesCompleted >= 5 && !currentProgress.badges['goal_getter']) {
-      // Award Goal Getter badge
-      const updatedBadges = { ...currentProgress.badges, goal_getter: true };
-      const newBadgeCount = currentProgress.badgeCount + 1;
-      
-      const updatedProgress = {
-        ...currentProgress,
-        badges: updatedBadges,
-        badgeCount: newBadgeCount,
-        earnedBadges: [...currentProgress.earnedBadges, 'goal_getter']
-      };
-      
-      updateProgress(updatedProgress);
-      setProgress(updatedProgress);
-      
-      // Show Goal Getter page
-      setCurrentScreen('goal-getter');
-      setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
-      
-      // Check for Super Star badge after awarding Goal Getter
-      setTimeout(() => {
-        checkSuperStarBadge();
-      }, 100);
+    // Only process if challenge is active and this is the expected badge
+    if (!currentProgress.challengeActive) return;
+    
+    const expectedBadgeId = ['calm_creator', 'mood_mapper', 'bounce_back', 'reflecto_rookie', 'focus_finder', 'great_job', 'brave_voice', 'what_if_explorer', 'truth_spotter', 'kind_heart', 'boost_buddy', 'stay_positive', 'good_listener', 'creative_spark', 'deep_thinker', 'resilient'][currentProgress.currentChallengeIndex];
+    
+    if (badgeId !== expectedBadgeId) return;
+    
+    // For content-based badges that should be awarded immediately
+    if (badgeId === 'brave_voice' || badgeId === 'truth_spotter') {
+      addPendingBadge(badgeId);
     }
   };
 
   const handleLogoClick = () => {
-    // Check for pending badge awards first
-    if (handlePendingBadgeDisplay()) {
-      return; // Stop further navigation if a pending badge was displayed
-    }
-
-    // Check Focus Finder before navigation
-    checkFocusFinderOnLeave();
+    handleSectionExit(currentScreen);
     
     if (currentScreen === 'settings') {
       setCurrentScreen('welcome');
@@ -227,15 +149,10 @@ const handleBadgeEarned = (badgeId: string) => {
   };
 
   const handleNavButtonClick = (screen: 'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges') => {
-    // Check for pending badge awards first
-    if (handlePendingBadgeDisplay()) {
-      return; // Stop further navigation if a pending badge was displayed
-    }
-
-    // Check Focus Finder before navigation
-    checkFocusFinderOnLeave();
+    handleSectionExit(currentScreen);
     
     setCurrentScreen(screen);
+    handleSectionEnter(screen);
     
     // Reset challenges sub-screen to next-challenge when navigating via sidebar
     if (screen === 'challenges') {
@@ -272,51 +189,29 @@ const handleBadgeEarned = (badgeId: string) => {
     setChallengesSubScreen('next-challenge');
     setNewlyEarnedBadge(null);
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
-    
-    // Check for Goal Getter after dismissing Focus Finder completion
-    if (newlyEarnedBadge === 'focus_finder') {
-      setTimeout(() => {
-        checkGoalGetter();
-      }, 100);
-    }
   };
 
   const handleMyBadgesFromApp = () => {
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
     setNewlyEarnedBadge(null);
-    // Navigate to My Badges page within challenges section
     setRobotSpeech(`Wow! You've already earned ${progress.badgeCount} badges! Just ${18 - progress.badgeCount} more to unlock the full set. Keep going!`);
-    
-    // Check for Goal Getter after dismissing Focus Finder completion
-    if (newlyEarnedBadge === 'focus_finder') {
-      setTimeout(() => {
-        checkGoalGetter();
-      }, 100);
-    }
   };
 
   const handleGoalGetterCollect = () => {
-    // Navigate to My Badges to show the Goal Getter badge
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
     setRobotSpeech(`Amazing! You've earned the Goal Getter badge! You now have ${progress.badgeCount} badges total. Keep going for more!`);
-    
-    // Check for Super Star badge after collecting Goal Getter
-    setTimeout(() => {
-      checkSuperStarBadge();
-    }, 100);
+  };
+
+  const handleSuperStarCollect = () => {
+    setCurrentScreen('challenges');
+    setChallengesSubScreen('my-badges');
+    setRobotSpeech(`Incredible! You're officially a Super Star! You've earned all ${progress.badgeCount} badges! What an amazing achievement!`);
   };
 
   const handleSectionClose = (sectionName: string) => {
-    // Check for pending badge awards first
-    if (handlePendingBadgeDisplay()) {
-      return; // Stop further navigation if a pending badge was displayed
-    }
-
-    // Check Focus Finder before closing
-    checkFocusFinderOnLeave();
-    
+    handleSectionExit(sectionName);
     setCurrentScreen('welcome');
     setRobotSpeech("Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!");
   };
@@ -460,7 +355,6 @@ const handleBadgeEarned = (badgeId: string) => {
           />
         ) : currentScreen === 'challenges' ? (
           <ChallengesSection 
-            key={challengesSubScreen}
             onClose={() => handleSectionClose('challenges')}
             setRobotSpeech={setRobotSpeech}
             initialSubScreen={challengesSubScreen}
@@ -476,6 +370,11 @@ const handleBadgeEarned = (badgeId: string) => {
           <GoalGetterPage
             progress={progress}
             onCollectBadge={handleGoalGetterCollect}
+          />
+        ) : currentScreen === 'super-star' ? (
+          <GoalGetterPage
+            progress={progress}
+            onCollectBadge={handleSuperStarCollect}
           />
         ) : (
           <div className="info-section">
@@ -531,11 +430,11 @@ const handleBadgeEarned = (badgeId: string) => {
           </div>
         )}
 
-        {/* Mobile Navigation Buttons - Now positioned after main content */}
+        {/* Mobile Navigation Buttons */}
         <MobileNavButtons onNavButtonClick={handleNavButtonClick} currentScreen={currentScreen} />
       </div>
 
-      {/* Grown-Up Access Modal */}
+      {/* Modals */}
       {showGrownUpModal && (
         <GrownUpAccessModal 
           onClose={() => setShowGrownUpModal(false)} 
@@ -543,7 +442,6 @@ const handleBadgeEarned = (badgeId: string) => {
         />
       )}
 
-      {/* Chat History Modal */}
       {showChatHistoryModal && (
         <ChatHistoryModal 
           onClose={() => setShowChatHistoryModal(false)} 
@@ -552,7 +450,6 @@ const handleBadgeEarned = (badgeId: string) => {
         />
       )}
 
-      {/* Mood History Modal */}
       {showMoodHistoryModal && (
         <MoodHistoryModal 
           onClose={() => setShowMoodHistoryModal(false)} 
@@ -563,5 +460,5 @@ const handleBadgeEarned = (badgeId: string) => {
     </div>
   );
 }
-// Debug: Triggering rebuild for badge award logic test
+
 export default App;

@@ -36,7 +36,7 @@ export const allBadges: Badge[] = [
   {
     id: 'focus_finder',
     name: 'Focus Finder',
-    description: 'Complete a challenge without switching sections',
+    description: 'Stay focused for 90 seconds',
     icon: '/badges/FocusFinder.png',
     colorIcon: '/badges/FocusFinder.png',
     earned: false
@@ -132,7 +132,7 @@ export const allBadges: Badge[] = [
   {
     id: 'resilient',
     name: 'Resilient',
-    description: 'Return 3 separate days',
+    description: 'Visit all 4 main sections in one session',
     icon: '/badges/Resilient.png',
     colorIcon: '/badges/Resilient.png',
     earned: false
@@ -140,7 +140,7 @@ export const allBadges: Badge[] = [
   {
     id: 'super_star',
     name: 'Super Star',
-    description: 'Earn all 18 badges',
+    description: 'Earn all 17 badges',
     icon: '/badges/SuperStar.png',
     colorIcon: '/badges/SuperStar.png',
     earned: false
@@ -175,7 +175,7 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'focus_finder_challenge',
     title: 'Focus Finder Challenge',
-    description: 'Complete a challenge without switching to other sections.\nFocus is your secret weapon for success!',
+    description: 'Stay focused in one section for 90 seconds with meaningful engagement.\nFocus is your secret weapon for success!',
     badgeId: 'focus_finder'
   },
   {
@@ -241,19 +241,18 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'resilient_challenge',
     title: 'Resilient Challenge',
-    description: 'Show your commitment by returning to ReflectoBot on different days.\nConsistency is the key to growth!',
+    description: 'Show your commitment by visiting all four main sections in one session.\nConsistency is the key to growth!',
     badgeId: 'resilient'
   }
 ];
 
-// Badge queue - CORRECTED: Removed goal_getter and super_star (they are reward badges, not challenges)
-// Focus Finder is now at position 5 (index 4)
+// Badge queue - ONLY actual challenges, NO reward badges
 export const badgeQueue = [
   'calm_creator',      // Challenge 1
   'mood_mapper',       // Challenge 2
   'bounce_back',       // Challenge 3
   'reflecto_rookie',   // Challenge 4
-  'focus_finder',      // Challenge 5 (moved here)
+  'focus_finder',      // Challenge 5 ✅ MOVED HERE
   'great_job',         // Challenge 6
   'brave_voice',       // Challenge 7
   'what_if_explorer',  // Challenge 8
@@ -265,5 +264,5 @@ export const badgeQueue = [
   'creative_spark',    // Challenge 14
   'deep_thinker',      // Challenge 15
   'resilient'          // Challenge 16
-  // goal_getter and super_star are NOT in the queue - they are reward badges
+  // ❌ goal_getter and super_star are NOT in the queue - they are reward badges
 ];

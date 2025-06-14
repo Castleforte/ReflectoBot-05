@@ -38,25 +38,41 @@ export interface ReflectoBotProgress {
   badges: Record<string, boolean>;
   badgeCount: number;
   earnedBadges: string[];
+  
+  // Challenge tracking
+  challengeActive: boolean;
+  currentChallengeIndex: number;
+  challengesCompleted: number;
+  
+  // Badge-specific progress
   moodCheckInCount: number;
   chatMessageCount: number;
   undoCount: number;
-  returnDays: string[];
-  pdfExportCount: 0;
-  whatIfPromptViews: number;
-  whatIfPromptsAnswered: number;
-  historyViews: number;
   drawingsSaved: number;
   colorsUsedInDrawing: number;
-  challengesCompleted: number;
+  pdfExportCount: number;
+  whatIfPromptsAnswered: number;
+  historyViews: number;
   readItToMeUsed: number;
-  lastVisitDate: string;
-  challengeActive: boolean;
-  currentChallengeIndex: number;
-  stayPositiveMessageCount: number;
   hasLongMessageSent: boolean;
+  stayPositiveMessageCount: number;
   hasLongPositiveMessage: boolean;
   kindHeartWordCount: number;
+  
+  // Focus Finder tracking
+  focusStartTime: number | null;
+  focusPage: string | null;
+  focusEngagementCount: number;
+  
+  // Resilient tracking
+  visitedSections: string[];
+  
+  // Daily tracking
+  returnDays: string[];
+  lastVisitDate: string;
+  
+  // Pending badges (for exit-based awards)
+  pendingBadges: string[];
 }
 
 export interface DrawingEntry {
