@@ -29,15 +29,15 @@ function ChatHistoryModal({ onClose, chatHistory, onBadgeEarned }: ChatHistoryMo
       try {
         await generatePdf(pdfContentRef.current, 'reflectobot-chat-history.pdf');
         
-        console.log('PDF export completed');
+        console.log('📝 Chat PDF exported');
         
-        // Immediately update the export count
+        // ✅ Immediately update the export count
         const progress = loadProgress();
         updateProgress({ pdfExportCount: progress.pdfExportCount + 1 });
         
-        console.log('Current PDF export count:', progress.pdfExportCount + 1);
+        console.log('📈 Export count incremented:', progress.pdfExportCount + 1);
         
-        // Immediately check for Great Job badge
+        // ✅ Immediately check for Great Job badge - ONLY called here
         onBadgeEarned('great_job');
       } catch (error) {
         console.error('Error generating PDF:', error);
