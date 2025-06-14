@@ -23,7 +23,8 @@ import {
   checkFocusFinderCompletion,
   trackSectionVisit,
   checkGoalGetterBadge,
-  checkSuperStarBadge
+  checkSuperStarBadge,
+  saveProgress
 } from './utils/progressManager';
 import { badgeQueue } from './badgeData';
 
@@ -238,14 +239,32 @@ function App() {
 
   // 🎯 CRITICAL FIX: Handle Next Challenge button with IMMEDIATE Goal Getter check
   const handleNextChallengeFromApp = () => {
-    console.log('🎯 Next Challenge clicked - checking for pending Goal Getter');
+    console.log('🎯 Next Challenge clicked - checking for immediate Goal Getter');
     
     // 🎯 IMMEDIATE CHECK: If Focus Finder was just completed, check Goal Getter NOW
     if (newlyEarnedBadge === 'focus_finder') {
       console.log('🎯 Focus Finder just completed - checking Goal Getter immediately');
-      if (checkGoalGetterBadge()) {
-        console.log('🎯 Goal Getter condition met - showing Goal Getter screen immediately');
-        setNewlyEarnedBadge(null); // Clear Focus Finder badge
+      
+      // 🎯 DIRECT IMPLEMENTATION: Check badge count and award Goal Getter
+      const updatedProgress = loadProgress();
+      const badgeCount = Object.values(updatedProgress.badges).filter(Boolean).length;
+      
+      console.log(`🎯 Current badge count: ${badgeCount}`);
+      
+      if (badgeCount >= 5 && !updatedProgress.badges.goal_getter) {
+        console.log('🎯 Goal Getter condition met - awarding badge immediately');
+        
+        // Award Goal Getter badge directly
+        updatedProgress.badges.goal_getter = true;
+        updatedProgress.badgeCount = badgeCount + 1;
+        updatedProgress.earnedBadges = [...updatedProgress.earnedBadges, 'goal_getter'];
+        saveProgress(updatedProgress);
+        
+        // Update local state
+        setProgress(updatedProgress);
+        
+        // Clear Focus Finder badge and show Goal Getter screen
+        setNewlyEarnedBadge(null);
         setCurrentScreen('goal-getter');
         setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
         return;
@@ -279,14 +298,32 @@ function App() {
 
   // 🎯 CRITICAL FIX: Handle My Badges button with IMMEDIATE Goal Getter check
   const handleMyBadgesFromApp = () => {
-    console.log('🎯 My Badges clicked - checking for pending Goal Getter');
+    console.log('🎯 My Badges clicked - checking for immediate Goal Getter');
     
     // 🎯 IMMEDIATE CHECK: If Focus Finder was just completed, check Goal Getter NOW
     if (newlyEarnedBadge === 'focus_finder') {
       console.log('🎯 Focus Finder just completed - checking Goal Getter immediately');
-      if (checkGoalGetterBadge()) {
-        console.log('🎯 Goal Getter condition met - showing Goal Getter screen immediately');
-        setNewlyEarnedBadge(null); // Clear Focus Finder badge
+      
+      // 🎯 DIRECT IMPLEMENTATION: Check badge count and award Goal Getter
+      const updatedProgress = loadProgress();
+      const badgeCount = Object.values(updatedProgress.badges).filter(Boolean).length;
+      
+      console.log(`🎯 Current badge count: ${badgeCount}`);
+      
+      if (badgeCount >= 5 && !updatedProgress.badges.goal_getter) {
+        console.log('🎯 Goal Getter condition met - awarding badge immediately');
+        
+        // Award Goal Getter badge directly
+        updatedProgress.badges.goal_getter = true;
+        updatedProgress.badgeCount = badgeCount + 1;
+        updatedProgress.earnedBadges = [...updatedProgress.earnedBadges, 'goal_getter'];
+        saveProgress(updatedProgress);
+        
+        // Update local state
+        setProgress(updatedProgress);
+        
+        // Clear Focus Finder badge and show Goal Getter screen
+        setNewlyEarnedBadge(null);
         setCurrentScreen('goal-getter');
         setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
         return;
