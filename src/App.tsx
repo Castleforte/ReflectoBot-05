@@ -236,9 +236,23 @@ function App() {
     }
   };
 
-  // 🎯 CRITICAL FIX: Handle Next Challenge button with pending Goal Getter check
+  // 🎯 CRITICAL FIX: Handle Next Challenge button with IMMEDIATE Goal Getter check
   const handleNextChallengeFromApp = () => {
-    // Check for pending Goal Getter FIRST
+    console.log('🎯 Next Challenge clicked - checking for pending Goal Getter');
+    
+    // 🎯 IMMEDIATE CHECK: If Focus Finder was just completed, check Goal Getter NOW
+    if (newlyEarnedBadge === 'focus_finder') {
+      console.log('🎯 Focus Finder just completed - checking Goal Getter immediately');
+      if (checkGoalGetterBadge()) {
+        console.log('🎯 Goal Getter condition met - showing Goal Getter screen immediately');
+        setNewlyEarnedBadge(null); // Clear Focus Finder badge
+        setCurrentScreen('goal-getter');
+        setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
+        return;
+      }
+    }
+    
+    // Check for pending Goal Getter
     if (pendingGoalGetter) {
       console.log('🎯 Pending Goal Getter detected - showing Goal Getter screen');
       setPendingGoalGetter(false);
@@ -263,9 +277,23 @@ function App() {
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
   };
 
-  // 🎯 CRITICAL FIX: Handle My Badges button with pending Goal Getter check
+  // 🎯 CRITICAL FIX: Handle My Badges button with IMMEDIATE Goal Getter check
   const handleMyBadgesFromApp = () => {
-    // Check for pending Goal Getter FIRST
+    console.log('🎯 My Badges clicked - checking for pending Goal Getter');
+    
+    // 🎯 IMMEDIATE CHECK: If Focus Finder was just completed, check Goal Getter NOW
+    if (newlyEarnedBadge === 'focus_finder') {
+      console.log('🎯 Focus Finder just completed - checking Goal Getter immediately');
+      if (checkGoalGetterBadge()) {
+        console.log('🎯 Goal Getter condition met - showing Goal Getter screen immediately');
+        setNewlyEarnedBadge(null); // Clear Focus Finder badge
+        setCurrentScreen('goal-getter');
+        setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
+        return;
+      }
+    }
+    
+    // Check for pending Goal Getter
     if (pendingGoalGetter) {
       console.log('🎯 Pending Goal Getter detected - showing Goal Getter screen');
       setPendingGoalGetter(false);
