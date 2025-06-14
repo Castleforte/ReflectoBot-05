@@ -145,7 +145,7 @@ function ChatSection({
     // Check for positive message and Stay Positive challenge
     if (isPositiveMessage(trimmedMessage)) {
       // Check if Stay Positive challenge is active
-      if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 12) { // stay_positive is at index 12
+      if (currentProgress.challengeActive && currentProgress.currentChallengeIndex === 11) { // stay_positive is at index 11
         progressUpdates.stayPositiveMessageCount = currentProgress.stayPositiveMessageCount + 1;
         
         // If this is a long positive message (15+ words), mark it
@@ -175,7 +175,7 @@ function ChatSection({
     }
 
     // Check for Stay Positive badge
-    if (isPositiveMessage(trimmedMessage) && currentProgress.challengeActive && currentProgress.currentChallengeIndex === 12) {
+    if (isPositiveMessage(trimmedMessage) && currentProgress.challengeActive && currentProgress.currentChallengeIndex === 11) {
       onBadgeEarned('stay_positive');
     }
     
@@ -187,6 +187,13 @@ function ChatSection({
       e.preventDefault(); // Prevent default new line behavior
       handleSendMessage();
     }
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setChatInputText(e.target.value);
+    
+    // Track engagement for Focus Finder
+    onEngagement();
   };
 
   return (
@@ -224,7 +231,7 @@ function ChatSection({
           <textarea
             className="chat-textarea"
             value={chatInputText}
-            onChange={(e) => setChatInputText(e.target.value)}
+            onChange={handleTextChange}
             onKeyDown={handleKeyDown}
             placeholder="Choose an option above or just type what's on your mind here – I'm listening."
           />

@@ -87,6 +87,23 @@ export const updateProgress = (updates: Partial<ReflectoBotProgress>): ReflectoB
 
 // Check if a badge should be awarded based on current progress
 export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgress): boolean => {
+  console.log(`Checking badge condition for ${badgeId}:`, {
+    drawingsSaved: progress.drawingsSaved,
+    moodCheckInCount: progress.moodCheckInCount,
+    undoCount: progress.undoCount,
+    chatMessageCount: progress.chatMessageCount,
+    pdfExportCount: progress.pdfExportCount,
+    whatIfPromptsAnswered: progress.whatIfPromptsAnswered,
+    kindHeartWordCount: progress.kindHeartWordCount,
+    readItToMeUsed: progress.readItToMeUsed,
+    stayPositiveMessageCount: progress.stayPositiveMessageCount,
+    hasLongPositiveMessage: progress.hasLongPositiveMessage,
+    historyViews: progress.historyViews,
+    colorsUsedInDrawing: progress.colorsUsedInDrawing,
+    hasLongMessageSent: progress.hasLongMessageSent,
+    visitedSections: progress.visitedSections
+  });
+
   switch (badgeId) {
     case 'calm_creator':
       return progress.drawingsSaved >= 1;
@@ -132,8 +149,11 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
 export const awardBadge = (badgeId: string): ReflectoBotProgress => {
   const progress = loadProgress();
   
+  console.log(`Awarding badge: ${badgeId}`);
+  
   // Don't award if already earned
   if (progress.badges[badgeId]) {
+    console.log(`Badge ${badgeId} already earned`);
     return progress;
   }
   
@@ -149,6 +169,7 @@ export const awardBadge = (badgeId: string): ReflectoBotProgress => {
   
   // If this is a challenge badge (not a reward badge), advance the challenge
   if (badgeQueue.includes(badgeId)) {
+    console.log(`Advancing challenge after awarding ${badgeId}`);
     updatedProgress = {
       ...updatedProgress,
       challengeActive: false,
@@ -166,7 +187,10 @@ export const awardBadge = (badgeId: string): ReflectoBotProgress => {
 export const checkGoalGetterBadge = (): boolean => {
   const progress = loadProgress();
   
+  console.log(`Checking Goal Getter: challengesCompleted=${progress.challengesCompleted}, hasGoalGetter=${progress.badges['goal_getter']}`);
+  
   if (progress.challengesCompleted >= 5 && !progress.badges['goal_getter']) {
+    console.log('Awarding Goal Getter badge');
     awardBadge('goal_getter');
     return true;
   }
@@ -183,7 +207,10 @@ export const checkSuperStarBadge = (): boolean => {
     id !== 'super_star' && progress.badges[id]
   ).length;
   
+  console.log(`Checking Super Star: otherBadgeCount=${otherBadgeCount}, hasSuperStar=${progress.badges['super_star']}`);
+  
   if (otherBadgeCount >= 17 && !progress.badges['super_star']) {
+    console.log('Awarding Super Star badge');
     awardBadge('super_star');
     return true;
   }
@@ -195,6 +222,7 @@ export const checkSuperStarBadge = (): boolean => {
 export const addPendingBadge = (badgeId: string): void => {
   const progress = loadProgress();
   if (!progress.pendingBadges.includes(badgeId) && !progress.badges[badgeId]) {
+    console.log(`Adding pending badge: ${badgeId}`);
     updateProgress({
       pendingBadges: [...progress.pendingBadges, badgeId]
     });
@@ -206,11 +234,15 @@ export const getPendingBadges = (): string[] => {
   const progress = loadProgress();
   const pending = [...progress.pendingBadges];
   
-  if (pending.length > 0) {
-    updateProgress({ pendingBadges: [] });
-  }
+  console.log(`Getting pending badges: ${pending}`);
   
   return pending;
+};
+
+// Clear pending badges
+export const clearPendingBadges = (): void => {
+  console.log('Clearing pending badges');
+  updateProgress({ pendingBadges: [] });
 };
 
 // Focus Finder specific functions
@@ -222,6 +254,7 @@ export const startFocusTracking = (page: string): void => {
       progress.currentChallengeIndex === 4 && // focus_finder is at index 4
       (page === 'chat' || page === 'daily-checkin' || page === 'what-if' || page === 'draw-it-out')) {
     
+    console.log(`Starting focus tracking for page: ${page}`);
     updateProgress({
       focusStartTime: Date.now(),
       focusPage: page,
@@ -234,8 +267,10 @@ export const trackFocusEngagement = (): void => {
   const progress = loadProgress();
   
   if (progress.focusStartTime && progress.focusPage) {
+    const newCount = progress.focusEngagementCount + 1;
+    console.log(`Focus engagement: ${newCount}`);
     updateProgress({
-      focusEngagementCount: progress.focusEngagementCount + 1
+      focusEngagementCount: newCount
     });
   }
 };
@@ -247,6 +282,8 @@ export const checkFocusFinderCompletion = (): boolean => {
       progress.focusEngagementCount >= 3 &&
       (Date.now() - progress.focusStartTime) >= 90000) { // 90 seconds
     
+    console.log('Focus Finder completed! Time and engagement requirements met.');
+    
     // Clear focus tracking
     updateProgress({
       focusStartTime: null,
@@ -257,6 +294,9 @@ export const checkFocusFinderCompletion = (): boolean => {
     return true;
   }
   
+  const timeRemaining = progress.focusStartTime ? 90000 - (Date.now() - progress.focusStartTime) : 0;
+  console.log(`Focus Finder progress: ${progress.focusEngagementCount}/3 engagements, ${Math.max(0, timeRemaining/1000)}s remaining`);
+  
   return false;
 };
 
@@ -266,6 +306,7 @@ export const trackSectionVisit = (section: string): void => {
   const validSections = ['chat', 'daily-checkin', 'what-if', 'draw-it-out'];
   
   if (validSections.includes(section) && !progress.visitedSections.includes(section)) {
+    console.log(`Tracking section visit: ${section}`);
     updateProgress({
       visitedSections: [...progress.visitedSections, section]
     });

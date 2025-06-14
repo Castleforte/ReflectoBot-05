@@ -20,6 +20,7 @@ import {
   checkBadgeCondition,
   addPendingBadge,
   getPendingBadges,
+  clearPendingBadges,
   startFocusTracking,
   trackFocusEngagement,
   checkFocusFinderCompletion,
@@ -27,6 +28,7 @@ import {
   checkGoalGetterBadge,
   checkSuperStarBadge
 } from './utils/progressManager';
+import { badgeQueue } from './badgeData';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges' | 'challenge-complete' | 'goal-getter' | 'super-star'>('welcome');
@@ -50,6 +52,8 @@ function App() {
 
   // Handle section navigation and tracking
   const handleSectionEnter = (section: string) => {
+    console.log(`Entering section: ${section}`);
+    
     // Track section visit for resilient badge
     trackSectionVisit(section);
     
@@ -62,42 +66,60 @@ function App() {
 
   // Handle section exit and check for pending badges
   const handleSectionExit = (fromSection: string) => {
+    console.log(`Exiting section: ${fromSection}`);
+    
     const currentProgress = loadProgress();
+    console.log('Current progress on exit:', currentProgress);
     
     // Check Focus Finder completion if leaving a tracked page
     if (currentProgress.focusPage === fromSection && checkFocusFinderCompletion()) {
+      console.log('Focus Finder completed! Adding to pending badges.');
       addPendingBadge('focus_finder');
     }
     
-    // Check for other badge conditions based on current challenge
-    const currentBadgeId = currentProgress.challengeActive ? 
-      ['calm_creator', 'mood_mapper', 'bounce_back', 'reflecto_rookie', 'focus_finder', 'great_job', 'brave_voice', 'what_if_explorer', 'truth_spotter', 'kind_heart', 'boost_buddy', 'stay_positive', 'good_listener', 'creative_spark', 'deep_thinker', 'resilient'][currentProgress.currentChallengeIndex] : 
-      null;
-    
-    if (currentBadgeId && checkBadgeCondition(currentBadgeId, currentProgress)) {
-      addPendingBadge(currentBadgeId);
+    // Check for current challenge badge completion
+    if (currentProgress.challengeActive) {
+      const currentBadgeId = badgeQueue[currentProgress.currentChallengeIndex];
+      console.log(`Checking badge condition for: ${currentBadgeId}`);
+      
+      if (currentBadgeId && checkBadgeCondition(currentBadgeId, loadProgress())) {
+        console.log(`Badge condition met for: ${currentBadgeId}. Adding to pending badges.`);
+        addPendingBadge(currentBadgeId);
+      }
     }
     
-    // Check resilient badge
-    if (currentProgress.visitedSections.length >= 4 && currentProgress.challengeActive && currentBadgeId === 'resilient') {
+    // Check resilient badge (visit all 4 sections)
+    const updatedProgress = loadProgress();
+    if (updatedProgress.visitedSections.length >= 4 && 
+        updatedProgress.challengeActive && 
+        badgeQueue[updatedProgress.currentChallengeIndex] === 'resilient') {
+      console.log('Resilient badge condition met! Adding to pending badges.');
       addPendingBadge('resilient');
     }
     
     // Process any pending badges
     const pendingBadges = getPendingBadges();
+    console.log('Pending badges:', pendingBadges);
+    
     if (pendingBadges.length > 0) {
       // Award the first pending badge
       const badgeToAward = pendingBadges[0];
-      const updatedProgress = awardBadge(badgeToAward);
-      setProgress(updatedProgress);
+      console.log(`Awarding badge: ${badgeToAward}`);
+      
+      const finalProgress = awardBadge(badgeToAward);
+      setProgress(finalProgress);
       setNewlyEarnedBadge(badgeToAward);
       setCurrentScreen('challenge-complete');
       setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
       
-      // Check for Goal Getter after awarding Focus Finder
+      // Clear remaining pending badges
+      clearPendingBadges();
+      
+      // Check for Goal Getter after awarding Focus Finder (5th challenge)
       if (badgeToAward === 'focus_finder') {
         setTimeout(() => {
           if (checkGoalGetterBadge()) {
+            console.log('Goal Getter badge awarded!');
             setCurrentScreen('goal-getter');
             setRobotSpeech("Incredible! You've completed your first 5 challenges! You're officially a Goal Getter!");
           }
@@ -107,6 +129,7 @@ function App() {
       // Check for Super Star after any badge
       setTimeout(() => {
         if (checkSuperStarBadge()) {
+          console.log('Super Star badge awarded!');
           setCurrentScreen('super-star');
           setRobotSpeech("Incredible! You've earned ALL the badges! You're officially a Super Star - what an amazing achievement!");
         }
@@ -119,19 +142,31 @@ function App() {
     trackFocusEngagement();
   };
 
-  // Handle immediate badge triggers (for content-based badges)
+  // Handle immediate badge triggers (for content-based badges like brave_voice, truth_spotter)
   const handleBadgeEarned = (badgeId: string) => {
     const currentProgress = loadProgress();
     
-    // Only process if challenge is active and this is the expected badge
-    if (!currentProgress.challengeActive) return;
+    console.log(`Badge earned trigger: ${badgeId}`);
+    console.log('Challenge active:', currentProgress.challengeActive);
+    console.log('Current challenge index:', currentProgress.currentChallengeIndex);
     
-    const expectedBadgeId = ['calm_creator', 'mood_mapper', 'bounce_back', 'reflecto_rookie', 'focus_finder', 'great_job', 'brave_voice', 'what_if_explorer', 'truth_spotter', 'kind_heart', 'boost_buddy', 'stay_positive', 'good_listener', 'creative_spark', 'deep_thinker', 'resilient'][currentProgress.currentChallengeIndex];
+    // Only process if challenge is active
+    if (!currentProgress.challengeActive) {
+      console.log('No active challenge, ignoring badge trigger');
+      return;
+    }
     
-    if (badgeId !== expectedBadgeId) return;
+    const expectedBadgeId = badgeQueue[currentProgress.currentChallengeIndex];
+    console.log('Expected badge:', expectedBadgeId);
     
-    // For content-based badges that should be awarded immediately
+    if (badgeId !== expectedBadgeId) {
+      console.log('Badge does not match expected challenge, ignoring');
+      return;
+    }
+    
+    // For content-based badges that should be awarded immediately when detected
     if (badgeId === 'brave_voice' || badgeId === 'truth_spotter') {
+      console.log(`Adding content-based badge to pending: ${badgeId}`);
       addPendingBadge(badgeId);
     }
   };
