@@ -77,6 +77,10 @@ export interface ReflectoBotProgress {
   // Content-based badge flags
   hasBraveVoiceMessage: boolean;
   hasTruthSpotterMessage: boolean;
+  
+  // Good Listener tracking
+  hasVisitedChatHistory: boolean;
+  hasVisitedMoodHistory: boolean;
 }
 
 export interface DrawingEntry {

@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { moodData } from '../moodData';
 import { generatePdf } from '../utils/pdfGenerator';
 import { MoodEntry } from '../types';
-import { updateProgress, loadProgress } from '../utils/progressManager';
+import { updateProgress, loadProgress, trackMoodHistoryVisit } from '../utils/progressManager';
 
 interface MoodHistoryModalProps {
   onClose: () => void;
@@ -14,14 +14,12 @@ interface MoodHistoryModalProps {
 function MoodHistoryModal({ onClose, moodHistory, onBadgeEarned }: MoodHistoryModalProps) {
   const pdfContentRef = useRef<HTMLDivElement>(null);
 
-  // Track history view when modal opens
+  // ✅ FIXED: Track Mood History visit when modal opens
   useEffect(() => {
-    // Update progress for good_listener badge
-    const currentProgress = loadProgress();
-    updateProgress({ 
-      historyViews: currentProgress.historyViews + 1 
-    });
+    console.log('📖 Mood History modal opened - tracking visit');
+    trackMoodHistoryVisit();
     
+    // Check if Good Listener badge should be triggered
     onBadgeEarned('good_listener');
   }, [onBadgeEarned]);
 

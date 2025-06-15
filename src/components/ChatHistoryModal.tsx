@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { generatePdf } from '../utils/pdfGenerator';
 import { ConversationTurn } from '../types';
-import { updateProgress, loadProgress } from '../utils/progressManager';
+import { updateProgress, loadProgress, trackChatHistoryVisit } from '../utils/progressManager';
 
 interface ChatHistoryModalProps {
   onClose: () => void;
@@ -13,14 +13,12 @@ interface ChatHistoryModalProps {
 function ChatHistoryModal({ onClose, chatHistory, onBadgeEarned }: ChatHistoryModalProps) {
   const pdfContentRef = useRef<HTMLDivElement>(null);
 
-  // Track history view when modal opens
+  // ✅ FIXED: Track Chat History visit when modal opens
   useEffect(() => {
-    // Update progress for good_listener badge
-    const currentProgress = loadProgress();
-    updateProgress({ 
-      historyViews: currentProgress.historyViews + 1 
-    });
+    console.log('📖 Chat History modal opened - tracking visit');
+    trackChatHistoryVisit();
     
+    // Check if Good Listener badge should be triggered
     onBadgeEarned('good_listener');
   }, [onBadgeEarned]);
 

@@ -148,9 +148,48 @@ function App() {
     }
     
     // For content-based badges that should be awarded immediately when detected
-    if (badgeId === 'brave_voice' || badgeId === 'truth_spotter') {
+    if (badgeId === 'brave_voice' || badgeId === 'truth_spotter' || badgeId === 'good_listener') {
       console.log(`🏆 Content-based badge detected: ${badgeId} - will award on section exit`);
       // These will be caught by the section exit logic
+    }
+  };
+
+  // ✅ FIXED: Handle modal close with Good Listener badge check
+  const handleModalClose = (modalType: 'chat' | 'mood') => {
+    console.log(`🚪 Closing ${modalType} history modal`);
+    
+    // Close the modal first
+    if (modalType === 'chat') {
+      setShowChatHistoryModal(false);
+    } else {
+      setShowMoodHistoryModal(false);
+    }
+    
+    // Check if Good Listener badge should be awarded after closing modal
+    const currentProgress = loadProgress();
+    
+    console.log('📖 Good Listener check on modal close:', {
+      challengeActive: currentProgress.challengeActive,
+      currentChallengeIndex: currentProgress.currentChallengeIndex,
+      expectedBadge: badgeQueue[currentProgress.currentChallengeIndex],
+      hasVisitedChatHistory: currentProgress.hasVisitedChatHistory,
+      hasVisitedMoodHistory: currentProgress.hasVisitedMoodHistory
+    });
+    
+    // Only award if Good Listener challenge is active and both histories have been visited
+    if (currentProgress.challengeActive && 
+        badgeQueue[currentProgress.currentChallengeIndex] === 'good_listener' &&
+        currentProgress.hasVisitedChatHistory && 
+        currentProgress.hasVisitedMoodHistory &&
+        !currentProgress.badges['good_listener']) {
+      
+      console.log('✅ Good Listener badge condition met - awarding badge');
+      
+      const finalProgress = awardBadge('good_listener');
+      setProgress(finalProgress);
+      setNewlyEarnedBadge('good_listener');
+      setCurrentScreen('challenge-complete');
+      setRobotSpeech("Wow! You just earned the Good Listener badge! You're such a thoughtful person for reflecting on your journey!");
     }
   };
 
@@ -549,7 +588,7 @@ function App() {
 
       {showChatHistoryModal && (
         <ChatHistoryModal 
-          onClose={() => setShowChatHistoryModal(false)} 
+          onClose={() => handleModalClose('chat')} 
           chatHistory={chatMessages}
           onBadgeEarned={handleBadgeEarned}
         />
@@ -557,7 +596,7 @@ function App() {
 
       {showMoodHistoryModal && (
         <MoodHistoryModal 
-          onClose={() => setShowMoodHistoryModal(false)} 
+          onClose={() => handleModalClose('mood')} 
           moodHistory={moodHistory}
           onBadgeEarned={handleBadgeEarned}
         />

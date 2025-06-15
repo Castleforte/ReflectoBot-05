@@ -47,7 +47,11 @@ export const getInitialProgress = (): ReflectoBotProgress => {
     
     // Content-based badge flags
     hasBraveVoiceMessage: false,
-    hasTruthSpotterMessage: false
+    hasTruthSpotterMessage: false,
+    
+    // Good Listener tracking
+    hasVisitedChatHistory: false,
+    hasVisitedMoodHistory: false
   };
 };
 
@@ -67,7 +71,9 @@ export const loadProgress = (): ReflectoBotProgress => {
         visitedSections: parsed.visitedSections ?? [],
         pendingBadges: parsed.pendingBadges ?? [],
         hasBraveVoiceMessage: parsed.hasBraveVoiceMessage ?? false,
-        hasTruthSpotterMessage: parsed.hasTruthSpotterMessage ?? false
+        hasTruthSpotterMessage: parsed.hasTruthSpotterMessage ?? false,
+        hasVisitedChatHistory: parsed.hasVisitedChatHistory ?? false,
+        hasVisitedMoodHistory: parsed.hasVisitedMoodHistory ?? false
       };
     }
   } catch (error) {
@@ -114,7 +120,9 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     hasLongMessageSent: progress.hasLongMessageSent,
     visitedSections: progress.visitedSections,
     hasBraveVoiceMessage: progress.hasBraveVoiceMessage,
-    hasTruthSpotterMessage: progress.hasTruthSpotterMessage
+    hasTruthSpotterMessage: progress.hasTruthSpotterMessage,
+    hasVisitedChatHistory: progress.hasVisitedChatHistory,
+    hasVisitedMoodHistory: progress.hasVisitedMoodHistory
   });
 
   switch (badgeId) {
@@ -146,7 +154,8 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     case 'stay_positive':
       return progress.stayPositiveMessageCount >= 1 && progress.hasLongPositiveMessage;
     case 'good_listener':
-      return progress.historyViews >= 3;
+      // ✅ FIXED: Check if both history pages have been visited
+      return progress.hasVisitedChatHistory && progress.hasVisitedMoodHistory;
     case 'creative_spark':
       return progress.colorsUsedInDrawing >= 5;
     case 'deep_thinker':
@@ -333,6 +342,29 @@ export const trackSectionVisit = (section: string): void => {
     console.log(`Tracking section visit: ${section}`);
     updateProgress({
       visitedSections: [...progress.visitedSections, section]
+    });
+  }
+};
+
+// ✅ NEW: Good Listener tracking functions
+export const trackChatHistoryVisit = (): void => {
+  const progress = loadProgress();
+  
+  if (!progress.hasVisitedChatHistory) {
+    console.log('📖 Tracking Chat History visit for Good Listener badge');
+    updateProgress({
+      hasVisitedChatHistory: true
+    });
+  }
+};
+
+export const trackMoodHistoryVisit = (): void => {
+  const progress = loadProgress();
+  
+  if (!progress.hasVisitedMoodHistory) {
+    console.log('📖 Tracking Mood History visit for Good Listener badge');
+    updateProgress({
+      hasVisitedMoodHistory: true
     });
   }
 };

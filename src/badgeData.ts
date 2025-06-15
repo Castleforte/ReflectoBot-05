@@ -108,7 +108,7 @@ export const allBadges: Badge[] = [
   {
     id: 'good_listener',
     name: 'Good Listener',
-    description: 'View chat or mood history 3 times',
+    description: 'Visit both Chat History and Mood History pages',
     icon: '/badges/GoodListener.png',
     colorIcon: '/badges/GoodListener.png',
     earned: false
@@ -223,7 +223,7 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'good_listener_challenge',
     title: 'Good Listener Challenge',
-    description: 'Reflect on your journey by viewing your chat or mood history 3 times.\nLooking back helps you move forward!',
+    description: 'Reflect on your journey by visiting both your Chat History and Mood History pages.\nLooking back helps you move forward!',
     badgeId: 'good_listener'
   },
   {
@@ -260,7 +260,7 @@ export const badgeQueue = [
   'kind_heart',        // Challenge 10
   'boost_buddy',       // Challenge 11
   'stay_positive',     // Challenge 12
-  'good_listener',     // Challenge 13
+  'good_listener',     // Challenge 13 ✅ UPDATED
   'creative_spark',    // Challenge 14
   'deep_thinker',      // Challenge 15
   'resilient'          // Challenge 16
