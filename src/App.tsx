@@ -81,18 +81,47 @@ function App() {
       badgeToAward = 'focus_finder';
     }
     
-    // Check for current challenge badge completion
-    if (currentProgress.challengeActive && !badgeToAward) {
+    // ✅ NEW: Check for final 4 badges that need award screens
+    if (!badgeToAward && currentProgress.challengeActive) {
       const currentBadgeId = badgeQueue[currentProgress.currentChallengeIndex];
       console.log(`🔍 Checking badge condition for: ${currentBadgeId}`);
       
-      if (currentBadgeId && checkBadgeCondition(currentBadgeId, loadProgress())) {
+      // ✅ FIXED: Check specific conditions for final 4 badges
+      if (currentBadgeId === 'good_listener' && 
+          currentProgress.hasVisitedChatHistory && 
+          currentProgress.hasVisitedMoodHistory &&
+          !currentProgress.badges['good_listener']) {
+        console.log('✅ Good Listener badge condition met!');
+        badgeToAward = 'good_listener';
+      }
+      else if (currentBadgeId === 'creative_spark' && 
+               fromSection === 'draw-it-out' &&
+               currentProgress.colorsUsedInDrawing >= 5 &&
+               !currentProgress.badges['creative_spark']) {
+        console.log('✅ Creative Spark badge condition met!');
+        badgeToAward = 'creative_spark';
+      }
+      else if (currentBadgeId === 'deep_thinker' && 
+               fromSection === 'chat' &&
+               currentProgress.hasLongMessageSent &&
+               !currentProgress.badges['deep_thinker']) {
+        console.log('✅ Deep Thinker badge condition met!');
+        badgeToAward = 'deep_thinker';
+      }
+      else if (currentBadgeId === 'resilient' && 
+               currentProgress.visitedSections.length >= 4 &&
+               !currentProgress.badges['resilient']) {
+        console.log('✅ Resilient badge condition met!');
+        badgeToAward = 'resilient';
+      }
+      // Check for current challenge badge completion (for other badges)
+      else if (currentBadgeId && checkBadgeCondition(currentBadgeId, loadProgress())) {
         console.log(`✅ Badge condition met for: ${currentBadgeId}`);
         badgeToAward = currentBadgeId;
       }
     }
     
-    // Check resilient badge (visit all 4 sections)
+    // Check resilient badge (visit all 4 sections) - fallback check
     if (!badgeToAward) {
       const updatedProgress = loadProgress();
       if (updatedProgress.visitedSections.length >= 4 && 
@@ -112,7 +141,25 @@ function App() {
       setProgress(finalProgress);
       setNewlyEarnedBadge(badgeToAward);
       setCurrentScreen('challenge-complete');
-      setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+      
+      // ✅ FIXED: Set appropriate robot speech for final 4 badges
+      switch (badgeToAward) {
+        case 'good_listener':
+          setRobotSpeech("Wow! You just earned the Good Listener badge! You're such a thoughtful person for reflecting on your journey!");
+          break;
+        case 'creative_spark':
+          setRobotSpeech("Amazing! You just earned the Creative Spark badge! Your colorful creativity is absolutely brilliant!");
+          break;
+        case 'deep_thinker':
+          setRobotSpeech("Incredible! You just earned the Deep Thinker badge! Your thoughtful words show real wisdom!");
+          break;
+        case 'resilient':
+          setRobotSpeech("Outstanding! You just earned the Resilient badge! You've shown amazing dedication by exploring every section!");
+          break;
+        default:
+          setRobotSpeech("Wow! You just earned a badge! That's amazing - you're doing such great work!");
+          break;
+      }
       
       return true; // ✅ BADGE WAS AWARDED - STOP NAVIGATION
     } else {
