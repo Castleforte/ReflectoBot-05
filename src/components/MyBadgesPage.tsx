@@ -5,10 +5,9 @@ import { ReflectoBotProgress } from '../types';
 interface MyBadgesPageProps {
   progress: ReflectoBotProgress;
   onNextChallenge: () => void;
-  allChallengesComplete?: boolean;
 }
 
-function MyBadgesPage({ progress, onNextChallenge, allChallengesComplete = false }: MyBadgesPageProps) {
+function MyBadgesPage({ progress, onNextChallenge }: MyBadgesPageProps) {
   return (
     <div className="my-badges-content">
       <div className="my-badges-header">
@@ -16,15 +15,11 @@ function MyBadgesPage({ progress, onNextChallenge, allChallengesComplete = false
         <div className="my-badges-header-right">
           <span id="badge-counter" className="badges-collected-indicator">{progress.badgeCount} of 18 Collected!</span>
           <button 
-            className={`next-challenge-header-button ${allChallengesComplete ? 'disabled' : ''}`}
+            className="next-challenge-header-button"
             onClick={onNextChallenge}
-            disabled={allChallengesComplete}
-            title={allChallengesComplete ? "You've completed all available challenges!" : "Go to next challenge"}
           >
             <img src="/My_Badges_Button_Icon.png" alt="Next Challenge" className="button-icon" />
-            <span className="font-bold leading-none">
-              {allChallengesComplete ? 'All Complete!' : 'Next Challenge'}
-            </span>
+            <span className="font-bold leading-none">Next Challenge</span>
           </button>
         </div>
       </div>
@@ -47,17 +42,6 @@ function MyBadgesPage({ progress, onNextChallenge, allChallengesComplete = false
           );
         })}
       </div>
-
-      {allChallengesComplete && (
-        <div className="completion-message">
-          <p className="text-center text-2xl font-bold text-[#a4f61e] mt-8">
-            🎉 Congratulations! You've earned every single badge! 🎉
-          </p>
-          <p className="text-center text-lg text-white mt-4">
-            You're officially a ReflectoBot Super Star!
-          </p>
-        </div>
-      )}
     </div>
   );
 }
