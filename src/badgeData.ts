@@ -229,7 +229,7 @@ export const challengeDetails: Challenge[] = [
   {
     id: 'creative_spark_challenge',
     title: 'Creative Spark Challenge',
-    description: 'Create a colorful drawing using at least 5 different colors - be sure to save it!\nLet your creativity shine!',
+    description: 'Create a colorful drawing using at least 5 different colors.\nLet your creativity shine!',
     badgeId: 'creative_spark'
   },
   {
