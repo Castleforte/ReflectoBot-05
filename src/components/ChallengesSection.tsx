@@ -12,7 +12,7 @@ interface ChallengesSectionProps {
   initialSubScreen?: 'next-challenge' | 'my-badges';
 }
 
-type ChallengeScreen = 'next-challenge' | 'challenge-complete' | 'my-badges';
+type ChallengeScreen = 'next-challenge' | 'challenge-complete' | 'my-badges' | 'all-complete';
 
 function ChallengesSection({ 
   onClose, 
@@ -25,8 +25,13 @@ function ChallengesSection({
 
   // Listen for changes in initialSubScreen prop and update internal state
   useEffect(() => {
-    setCurrentScreen(initialSubScreen);
-  }, [initialSubScreen]);
+    // Check if all challenges are complete
+    if (progress.badgeCount >= 18) {
+      setCurrentScreen('all-complete');
+    } else {
+      setCurrentScreen(initialSubScreen);
+    }
+  }, [initialSubScreen, progress.badgeCount]);
 
   // Get the current challenge based on progress
   const getCurrentChallenge = () => {
@@ -87,9 +92,15 @@ function ChallengesSection({
   };
 
   const handleNextChallenge = () => {
-    setCurrentScreen('next-challenge');
-    setNewlyEarnedBadge(null);
-    setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
+    // Check if all challenges are complete
+    if (progress.badgeCount >= 18) {
+      setCurrentScreen('all-complete');
+      setRobotSpeech("You've completed every single challenge! What an incredible achievement!");
+    } else {
+      setCurrentScreen('next-challenge');
+      setNewlyEarnedBadge(null);
+      setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
+    }
   };
 
   const handleMyBadges = () => {
@@ -98,17 +109,23 @@ function ChallengesSection({
   };
 
   const handleBackToNextChallenge = () => {
-    setCurrentScreen('next-challenge');
-    setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
+    // Check if all challenges are complete
+    if (progress.badgeCount >= 18) {
+      setCurrentScreen('all-complete');
+      setRobotSpeech("You've completed every single challenge! What an incredible achievement!");
+    } else {
+      setCurrentScreen('next-challenge');
+      setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
+    }
   };
 
-  // If all challenges are completed, show completion message
-  if (!currentChallenge) {
+  // If all challenges are completed, show completion screen
+  if (currentScreen === 'all-complete' || (!currentChallenge && progress.badgeCount >= 18)) {
     return (
       <div className="challenges-section">
         <div className="next-challenge-content">
           <div className="next-challenge-header">
-            <h1 className="next-challenge-title">All Challenges Complete!</h1>
+            <h1 className="next-challenge-title">You've Completed All Challenges!</h1>
             <button 
               className="my-badges-button"
               onClick={handleMyBadges}
@@ -120,17 +137,21 @@ function ChallengesSection({
           
           <div className="challenge-card">
             <div className="challenge-content">
-              <h2 className="challenge-card-title">Congratulations!</h2>
+              <h2 className="challenge-card-title">Congratulations, Super Star!</h2>
               <p className="challenge-card-description">
-                You've completed all available challenges! You're a true ReflectoBot champion.
-                Keep exploring and growing with your AI buddy!
+                You've earned all the badges and completed every ReflectoBot challenge! 
+                That's a huge accomplishment that shows incredible dedication, creativity, and heart.
+                <br /><br />
+                Feel free to revisit any section to continue exploring your thoughts and feelings, 
+                or start fresh by resetting your progress in Settings if you want to experience 
+                the journey again!
               </p>
               <div className="challenge-buttons-container">
                 <button 
                   className="start-challenge-button"
                   onClick={handleMyBadges}
                 >
-                  View All Badges
+                  View All My Badges
                 </button>
               </div>
             </div>
@@ -140,6 +161,10 @@ function ChallengesSection({
               className="challenge-badge"
             />
           </div>
+          
+          <p className="challenge-helper-text">
+            You're officially a ReflectoBot Super Star! What an amazing journey you've completed!
+          </p>
         </div>
       </div>
     );
@@ -148,7 +173,7 @@ function ChallengesSection({
   return (
     <div className="challenges-section">
       {/* Regular next challenge page */}
-      {currentScreen === 'next-challenge' && (
+      {currentScreen === 'next-challenge' && currentChallenge && (
         <NextChallengePage
           challenge={currentChallenge}
           onStartChallenge={handleStartChallenge}
@@ -170,6 +195,7 @@ function ChallengesSection({
         <MyBadgesPage
           progress={progress}
           onNextChallenge={handleBackToNextChallenge}
+          allChallengesComplete={progress.badgeCount >= 18}
         />
       )}
     </div>
