@@ -235,7 +235,7 @@ export const checkGoalGetterBadge = (): boolean => {
   return false;
 };
 
-// Check and award Super Star badge
+// ✅ NEW: Check and award Super Star badge
 export const checkSuperStarBadge = (): boolean => {
   const progress = loadProgress();
   
@@ -244,14 +244,15 @@ export const checkSuperStarBadge = (): boolean => {
     id !== 'super_star' && progress.badges[id]
   ).length;
   
-  console.log(`Checking Super Star: otherBadgeCount=${otherBadgeCount}, hasSuperStar=${progress.badges['super_star']}`);
+  console.log(`🌟 Checking Super Star: otherBadgeCount=${otherBadgeCount}, hasSuperStar=${progress.badges['super_star']}`);
   
   if (otherBadgeCount >= 17 && !progress.badges['super_star']) {
-    console.log('Awarding Super Star badge');
+    console.log('⭐ Super Star condition met - awarding badge');
     awardBadge('super_star');
     return true;
   }
   
+  console.log('❌ Super Star condition NOT met');
   return false;
 };
 

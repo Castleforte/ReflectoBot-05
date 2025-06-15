@@ -357,6 +357,29 @@ function App() {
   const handleNextChallengeFromApp = () => {
     console.log('🎯 Next Challenge clicked');
     
+    // ✅ NEW: Check for Super Star after Resilient
+    if (newlyEarnedBadge === 'resilient') {
+      console.log('🌟 Resilient just completed — checking for Super Star');
+      
+      const progress = loadProgress();
+      
+      // Count all badges except super_star itself
+      const otherBadgeCount = Object.keys(progress.badges).filter(id => 
+        id !== 'super_star' && progress.badges[id]
+      ).length;
+      
+      console.log(`🌟 Super Star check: ${otherBadgeCount}/17 badges earned`);
+      
+      if (otherBadgeCount >= 17 && !progress.badges['super_star']) {
+        console.log('⭐ Super Star condition met - awarding badge');
+        awardBadge('super_star');
+        setNewlyEarnedBadge(null);
+        setCurrentScreen('super-star');
+        setRobotSpeech("Wow! You've completed every challenge and earned every badge! You're officially a Super Star!");
+        return;
+      }
+    }
+    
     // ✅ CRITICAL FIX: Clear the newly earned badge state
     setNewlyEarnedBadge(null);
     
@@ -401,6 +424,29 @@ function App() {
   // 🎯 FIXED: Handle My Badges button with direct Goal Getter and Super Star checks
   const handleMyBadgesFromApp = () => {
     console.log('🎯 My Badges clicked');
+    
+    // ✅ NEW: Check for Super Star after Resilient
+    if (newlyEarnedBadge === 'resilient') {
+      console.log('🌟 Resilient just completed — checking for Super Star');
+      
+      const progress = loadProgress();
+      
+      // Count all badges except super_star itself
+      const otherBadgeCount = Object.keys(progress.badges).filter(id => 
+        id !== 'super_star' && progress.badges[id]
+      ).length;
+      
+      console.log(`🌟 Super Star check: ${otherBadgeCount}/17 badges earned`);
+      
+      if (otherBadgeCount >= 17 && !progress.badges['super_star']) {
+        console.log('⭐ Super Star condition met - awarding badge');
+        awardBadge('super_star');
+        setNewlyEarnedBadge(null);
+        setCurrentScreen('super-star');
+        setRobotSpeech("Wow! You've completed every challenge and earned every badge! You're officially a Super Star!");
+        return;
+      }
+    }
     
     // ✅ CRITICAL FIX: Clear the newly earned badge state
     setNewlyEarnedBadge(null);
