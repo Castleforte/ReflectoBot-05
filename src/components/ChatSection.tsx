@@ -142,19 +142,19 @@ function ChatSection({
       chatMessageCount: currentProgress.chatMessageCount + 1
     };
 
-    // ✅ FIXED: Check for long message (15+ words) - SET FLAG BUT DON'T AWARD IMMEDIATELY
+    // Check for long message (15+ words)
     if (wordCount >= 15) {
       progressUpdates.hasLongMessageSent = true;
-      console.log('✅ Long message detected (15+ words) - flag set for Deep Thinker badge');
+      console.log('✅ Long message detected (15+ words)');
     }
 
-    // ✅ FIXED: Check for "because" keyword for Brave Voice badge - SET FLAG BUT DON'T AWARD IMMEDIATELY
+    // ✅ FIXED: Check for "because" keyword for Brave Voice badge
     if (trimmedMessage.toLowerCase().includes('because')) {
       console.log('✅ "Because" keyword detected - setting brave voice flag');
       progressUpdates.hasBraveVoiceMessage = true;
     }
     
-    // ✅ FIXED: Check for "I realized" keyword for Truth Spotter badge - SET FLAG BUT DON'T AWARD IMMEDIATELY
+    // ✅ FIXED: Check for "I realized" keyword for Truth Spotter badge
     if (trimmedMessage.toLowerCase().includes('i realized')) {
       console.log('✅ "I realized" phrase detected - setting truth spotter flag');
       progressUpdates.hasTruthSpotterMessage = true;
@@ -177,15 +177,31 @@ function ChatSection({
     // Update progress with all changes
     updateProgress(progressUpdates);
 
-    // ✅ FIXED: Only trigger reflecto_rookie badge (first message badge)
+    // Track badge progress
     onBadgeEarned('reflecto_rookie'); // Track message for Reflecto Rookie
     
-    // ✅ REMOVED: No longer immediately trigger other badges - they will be checked on section exit
-    // The following badges will be awarded when user exits the Chat section:
-    // - deep_thinker (15+ words)
-    // - brave_voice (contains "because")
-    // - truth_spotter (contains "I realized")
-    // - stay_positive (positive message with 15+ words)
+    // Check for specific badge conditions
+    if (wordCount >= 15) {
+      console.log('🏆 Triggering deep_thinker badge (15+ words)');
+      onBadgeEarned('deep_thinker'); // 15+ words badge
+    }
+    
+    // ✅ FIXED: Check for "because" keyword for Brave Voice badge
+    if (trimmedMessage.toLowerCase().includes('because')) {
+      console.log('🏆 Triggering brave_voice badge (contains "because")');
+      onBadgeEarned('brave_voice'); // Contains "because" badge
+    }
+    
+    if (trimmedMessage.toLowerCase().includes('i realized')) {
+      console.log('🏆 Triggering truth_spotter badge (contains "I realized")');
+      onBadgeEarned('truth_spotter'); // Contains "I realized" badge
+    }
+
+    // Check for Stay Positive badge
+    if (isPositiveMessage(trimmedMessage) && currentProgress.challengeActive && currentProgress.currentChallengeIndex === 11) {
+      console.log('🏆 Triggering stay_positive badge (positive message)');
+      onBadgeEarned('stay_positive');
+    }
     
     // TODO: Replace this logic with actual GPT API call in the future
   };
