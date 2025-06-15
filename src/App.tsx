@@ -8,6 +8,7 @@ import DrawItOutSection from './components/DrawItOutSection';
 import ChallengesSection from './components/ChallengesSection';
 import ChallengeCompletePage from './components/ChallengeCompletePage';
 import GoalGetterPage from './components/GoalGetterPage';
+import SuperStarPage from './components/SuperStarPage';
 import GrownUpAccessModal from './components/GrownUpAccessModal';
 import ChatHistoryModal from './components/ChatHistoryModal';
 import MoodHistoryModal from './components/MoodHistoryModal';
@@ -253,7 +254,7 @@ function App() {
     }
   };
 
-  // 🎯 FIXED: Handle Next Challenge button with direct Goal Getter check
+  // 🎯 FIXED: Handle Next Challenge button with direct Goal Getter and Super Star checks
   const handleNextChallengeFromApp = () => {
     console.log('🎯 Next Challenge clicked');
     
@@ -273,11 +274,13 @@ function App() {
       }
     }
 
-    // Check for Super Star after any other badge
+    // ✅ NEW: Check for Super Star after any other badge
     const currentProgress = loadProgress();
     const otherBadgeCount = Object.keys(currentProgress.badges).filter(id => 
       id !== 'super_star' && currentProgress.badges[id]
     ).length;
+    
+    console.log(`🌟 Super Star check: ${otherBadgeCount}/17 badges earned`);
     
     if (otherBadgeCount >= 17 && !currentProgress.badges['super_star']) {
       console.log('⭐ Super Star condition met - awarding badge');
@@ -287,14 +290,14 @@ function App() {
       return;
     }
     
-    // Fallback (if Goal Getter not triggered)
+    // Fallback (if Goal Getter or Super Star not triggered)
     setCurrentScreen('challenges');
     setChallengesSubScreen('next-challenge');
     setNewlyEarnedBadge(null);
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
   };
 
-  // 🎯 FIXED: Handle My Badges button with direct Goal Getter check
+  // 🎯 FIXED: Handle My Badges button with direct Goal Getter and Super Star checks
   const handleMyBadgesFromApp = () => {
     console.log('🎯 My Badges clicked');
     
@@ -314,11 +317,13 @@ function App() {
       }
     }
 
-    // Check for Super Star after any other badge
+    // ✅ NEW: Check for Super Star after any other badge
     const currentProgress = loadProgress();
     const otherBadgeCount = Object.keys(currentProgress.badges).filter(id => 
       id !== 'super_star' && currentProgress.badges[id]
     ).length;
+    
+    console.log(`🌟 Super Star check: ${otherBadgeCount}/17 badges earned`);
     
     if (otherBadgeCount >= 17 && !currentProgress.badges['super_star']) {
       console.log('⭐ Super Star condition met - awarding badge');
@@ -328,7 +333,7 @@ function App() {
       return;
     }
     
-    // Fallback (if Goal Getter not triggered)
+    // Fallback (if Goal Getter or Super Star not triggered)
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
     setNewlyEarnedBadge(null);
@@ -341,6 +346,7 @@ function App() {
     setRobotSpeech(`Amazing! You've earned the Goal Getter badge! You now have ${progress.badgeCount} badges total. Keep going for more!`);
   };
 
+  // ✅ NEW: Handle Super Star badge collection
   const handleSuperStarCollect = () => {
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
@@ -516,7 +522,7 @@ function App() {
             onCollectBadge={handleGoalGetterCollect}
           />
         ) : currentScreen === 'super-star' ? (
-          <GoalGetterPage
+          <SuperStarPage
             progress={progress}
             onCollectBadge={handleSuperStarCollect}
           />
