@@ -262,13 +262,18 @@ function DrawItOutSection({ onClose, setRobotSpeech, onBadgeEarned, onEngagement
     // Track drawing save for calm_creator badge
     onBadgeEarned('calm_creator');
     
-    // Track colors used for creative_spark badge
+    // ✅ FIXED: Only check for creative_spark badge if 5+ colors were used AND badge not already earned
     if (usedColors.size >= 5) {
-      const updatedProgress = loadProgress();
-      updateProgress({ 
-        colorsUsedInDrawing: Math.max(updatedProgress.colorsUsedInDrawing, usedColors.size)
-      });
-      onBadgeEarned('creative_spark');
+      const progress = loadProgress();
+      if (!progress.badges['creative_spark']) {
+        console.log(`🎨 Creative Spark: Used ${usedColors.size} colors, awarding badge`);
+        updateProgress({ 
+          colorsUsedInDrawing: Math.max(progress.colorsUsedInDrawing, usedColors.size)
+        });
+        onBadgeEarned('creative_spark');
+      } else {
+        console.log(`🎨 Creative Spark: Already earned, not awarding again`);
+      }
     }
 
     // Reset used colors for next drawing

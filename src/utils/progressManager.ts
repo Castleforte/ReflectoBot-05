@@ -122,14 +122,21 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     hasBraveVoiceMessage: progress.hasBraveVoiceMessage,
     hasTruthSpotterMessage: progress.hasTruthSpotterMessage,
     hasVisitedChatHistory: progress.hasVisitedChatHistory,
-    hasVisitedMoodHistory: progress.hasVisitedMoodHistory
+    hasVisitedMoodHistory: progress.hasVisitedMoodHistory,
+    badgeAlreadyEarned: progress.badges[badgeId]
   });
+
+  // ✅ CRITICAL FIX: Always check if badge is already earned first
+  if (progress.badges[badgeId]) {
+    console.log(`❌ Badge ${badgeId} already earned, not awarding again`);
+    return false;
+  }
 
   switch (badgeId) {
     case 'calm_creator':
       return progress.drawingsSaved >= 1;
     case 'mood_mapper':
-      return progress.moodCheckInCount >= 1; // ✅ FIXED: Only need 1 check-in with 25+ words
+      return progress.moodCheckInCount >= 1;
     case 'bounce_back':
       return progress.undoCount >= 3;
     case 'reflecto_rookie':
@@ -140,12 +147,10 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     case 'great_job':
       return progress.pdfExportCount >= 1;
     case 'brave_voice':
-      // ✅ FIXED: Check for brave voice message flag
       return progress.hasBraveVoiceMessage;
     case 'what_if_explorer':
       return progress.whatIfPromptsAnswered >= 3;
     case 'truth_spotter':
-      // ✅ FIXED: Check for truth spotter message flag
       return progress.hasTruthSpotterMessage;
     case 'kind_heart':
       return progress.kindHeartWordCount >= 25;
@@ -154,7 +159,6 @@ export const checkBadgeCondition = (badgeId: string, progress: ReflectoBotProgre
     case 'stay_positive':
       return progress.stayPositiveMessageCount >= 1 && progress.hasLongPositiveMessage;
     case 'good_listener':
-      // ✅ FIXED: Check if both history pages have been visited
       return progress.hasVisitedChatHistory && progress.hasVisitedMoodHistory;
     case 'creative_spark':
       return progress.colorsUsedInDrawing >= 5;
@@ -174,9 +178,9 @@ export const awardBadge = (badgeId: string): ReflectoBotProgress => {
   console.log(`🏆 Awarding badge: ${badgeId}`);
   console.log(`📊 Current challengesCompleted BEFORE award: ${progress.challengesCompleted}`);
   
-  // Don't award if already earned
+  // ✅ CRITICAL FIX: Don't award if already earned
   if (progress.badges[badgeId]) {
-    console.log(`Badge ${badgeId} already earned`);
+    console.log(`❌ Badge ${badgeId} already earned, not awarding again`);
     return progress;
   }
   
