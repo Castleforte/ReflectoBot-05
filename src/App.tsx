@@ -195,6 +195,15 @@ function App() {
   };
 
   const handleLogoClick = () => {
+    // ✅ CRITICAL FIX: Don't check for badge award if we're on challenge-complete screen
+    if (currentScreen === 'challenge-complete' || currentScreen === 'goal-getter' || currentScreen === 'super-star') {
+      console.log('🚫 On award screen - forcing navigation to settings without badge check');
+      setCurrentScreen('settings');
+      setNewlyEarnedBadge(null); // Clear any pending badge
+      setRobotSpeech("Tuning things just the way you like them? Smart move! You can save your session, adjust sounds-or even start fresh. Your ReflectoBot, your rules!");
+      return;
+    }
+    
     // ✅ CHECK FOR BADGE AWARD FIRST - STOP IF BADGE AWARDED
     const badgeAwarded = handleSectionExit(currentScreen);
     if (badgeAwarded) {
@@ -213,6 +222,45 @@ function App() {
   };
 
   const handleNavButtonClick = (screen: 'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges') => {
+    // ✅ CRITICAL FIX: Don't check for badge award if we're on challenge-complete screen
+    if (currentScreen === 'challenge-complete' || currentScreen === 'goal-getter' || currentScreen === 'super-star') {
+      console.log('🚫 On award screen - forcing navigation without badge check');
+      setCurrentScreen(screen);
+      setNewlyEarnedBadge(null); // Clear any pending badge
+      handleSectionEnter(screen);
+      
+      // Reset challenges sub-screen to next-challenge when navigating via sidebar
+      if (screen === 'challenges') {
+        setChallengesSubScreen('next-challenge');
+      }
+      
+      // Set appropriate robot speech
+      switch (screen) {
+        case 'chat':
+          setRobotSpeech("Ready to chat? I'm here to listen! You can use the prompts to get started, or just tell me what's on your mind. Let's explore your thoughts together!");
+          break;
+        case 'daily-checkin':
+          setRobotSpeech("Time for your daily check-in! How are you feeling today? Pick an emoji that matches your mood, or just tell me what's going on.");
+          break;
+        case 'what-if':
+          setRobotSpeech("Time to let your imagination soar! I've got some wild What If questions that'll get your creative wheels turning. Ready to think outside the box?");
+          break;
+        case 'draw-it-out':
+          setRobotSpeech("Sometimes feelings are hard to explain with words—so let's draw them instead!");
+          break;
+        case 'challenges':
+          setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
+          break;
+        case 'settings':
+          setRobotSpeech("Tuning things just the way you like them? Smart move! You can save your session, adjust sounds-or even start fresh. Your ReflectoBot, your rules!");
+          break;
+        default:
+          setRobotSpeech("Hey friend! I'm Reflekto, your AI buddy. Let's explore your thoughts together — and if you want to tweak anything, just tap my logo!");
+          break;
+      }
+      return;
+    }
+    
     // ✅ CHECK FOR BADGE AWARD FIRST - STOP IF BADGE AWARDED
     const badgeAwarded = handleSectionExit(currentScreen);
     if (badgeAwarded) {
@@ -258,6 +306,9 @@ function App() {
   const handleNextChallengeFromApp = () => {
     console.log('🎯 Next Challenge clicked');
     
+    // ✅ CRITICAL FIX: Clear the newly earned badge state
+    setNewlyEarnedBadge(null);
+    
     // 🎯 CRITICAL FIX: Check for Focus Finder completion and Goal Getter eligibility
     if (newlyEarnedBadge === 'focus_finder') {
       console.log('Focus Finder just completed — immediately checking for Goal Getter');
@@ -293,13 +344,15 @@ function App() {
     // Fallback (if Goal Getter or Super Star not triggered)
     setCurrentScreen('challenges');
     setChallengesSubScreen('next-challenge');
-    setNewlyEarnedBadge(null);
     setRobotSpeech("Ready for a new challenge? Put on your thinking cap and give this one a try!");
   };
 
   // 🎯 FIXED: Handle My Badges button with direct Goal Getter and Super Star checks
   const handleMyBadgesFromApp = () => {
     console.log('🎯 My Badges clicked');
+    
+    // ✅ CRITICAL FIX: Clear the newly earned badge state
+    setNewlyEarnedBadge(null);
     
     // 🎯 CRITICAL FIX: Check for Focus Finder completion and Goal Getter eligibility
     if (newlyEarnedBadge === 'focus_finder') {
@@ -336,13 +389,13 @@ function App() {
     // Fallback (if Goal Getter or Super Star not triggered)
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
-    setNewlyEarnedBadge(null);
     setRobotSpeech(`Wow! You've already earned ${progress.badgeCount} badges! Just ${18 - progress.badgeCount} more to unlock the full set. Keep going!`);
   };
 
   const handleGoalGetterCollect = () => {
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
+    setNewlyEarnedBadge(null); // Clear the badge state
     setRobotSpeech(`Amazing! You've earned the Goal Getter badge! You now have ${progress.badgeCount} badges total. Keep going for more!`);
   };
 
@@ -350,6 +403,7 @@ function App() {
   const handleSuperStarCollect = () => {
     setCurrentScreen('challenges');
     setChallengesSubScreen('my-badges');
+    setNewlyEarnedBadge(null); // Clear the badge state
     setRobotSpeech(`Incredible! You're officially a Super Star! You've earned all ${progress.badgeCount} badges! What an amazing achievement!`);
   };
 
