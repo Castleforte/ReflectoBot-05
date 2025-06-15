@@ -242,9 +242,11 @@ function App() {
   };
 
   const handleLogoClick = () => {
-    // ✅ CRITICAL FIX: Don't check for badge award if we're on challenge-complete screen
-    if (currentScreen === 'challenge-complete' || currentScreen === 'goal-getter' || currentScreen === 'super-star') {
-      console.log('🚫 On award screen - forcing navigation to settings without badge check');
+    // ✅ CRITICAL FIX: Check if we're on any award screen and bypass all badge logic
+    const isOnAwardScreen = currentScreen === 'challenge-complete' || currentScreen === 'goal-getter' || currentScreen === 'super-star';
+    
+    if (isOnAwardScreen) {
+      console.log('🚫 On award screen - forcing navigation to settings without any badge checks');
       setCurrentScreen('settings');
       setNewlyEarnedBadge(null); // Clear any pending badge
       setRobotSpeech("Tuning things just the way you like them? Smart move! You can save your session, adjust sounds-or even start fresh. Your ReflectoBot, your rules!");
@@ -269,9 +271,11 @@ function App() {
   };
 
   const handleNavButtonClick = (screen: 'welcome' | 'settings' | 'chat' | 'daily-checkin' | 'what-if' | 'draw-it-out' | 'challenges') => {
-    // ✅ CRITICAL FIX: Don't check for badge award if we're on challenge-complete screen
-    if (currentScreen === 'challenge-complete' || currentScreen === 'goal-getter' || currentScreen === 'super-star') {
-      console.log('🚫 On award screen - forcing navigation without badge check');
+    // ✅ CRITICAL FIX: Check if we're on any award screen and bypass all badge logic
+    const isOnAwardScreen = currentScreen === 'challenge-complete' || currentScreen === 'goal-getter' || currentScreen === 'super-star';
+    
+    if (isOnAwardScreen) {
+      console.log('🚫 On award screen - forcing navigation without any badge checks');
       setCurrentScreen(screen);
       setNewlyEarnedBadge(null); // Clear any pending badge
       handleSectionEnter(screen);
